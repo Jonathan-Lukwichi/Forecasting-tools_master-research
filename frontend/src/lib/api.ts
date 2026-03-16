@@ -313,6 +313,103 @@ export async function exploreDataset(
 }
 
 // ---------------------------------------------------------------------------
+// Training Jobs (Celery background tasks)
+// ---------------------------------------------------------------------------
+export interface TrainJobRequest {
+  dataset_id: string;
+  model_type: string;
+  horizons?: number[];
+  hyperparameters?: Record<string, unknown>;
+  auto_tune?: boolean;
+  n_trials?: number;
+}
+
+export interface BaselineJobRequest {
+  dataset_id: string;
+  model_type: string;
+  order?: number[] | null;
+  seasonal_order?: number[] | null;
+  auto_order?: boolean;
+}
+
+export interface JobSubmitResponse {
+  job_id: string;
+  status: string;
+}
+
+export interface JobStatus {
+  job_id: string;
+  status: "queued" | "running" | "completed" | "failed";
+  progress: number;
+  stage?: string;
+  message?: string;
+  result?: TrainResult;
+  error?: string;
+}
+
+export interface TrainResult {
+  status: string;
+  model_id: string;
+  model_type: string;
+  model_name: string;
+  metrics: { rmse: number; mae: number; mape: number };
+  all_metrics?: Record<string, Record<string, number>>;
+  training_time: number;
+  error?: string;
+}
+
+export async function submitTrainingJob(
+  body: TrainJobRequest
+): Promise<JobSubmitResponse> {
+  return apiFetch<JobSubmitResponse>("/api/jobs/train", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function submitBaselineJob(
+  body: BaselineJobRequest
+): Promise<JobSubmitResponse> {
+  return apiFetch<JobSubmitResponse>("/api/jobs/train/baseline", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function getJobStatus(jobId: string): Promise<JobStatus> {
+  return apiFetch<JobStatus>(`/api/jobs/${jobId}`);
+}
+
+export async function cancelJob(jobId: string): Promise<{ cancelled: boolean }> {
+  return apiFetch<{ cancelled: boolean }>(`/api/jobs/${jobId}`, {
+    method: "DELETE",
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Model Comparison
+// ---------------------------------------------------------------------------
+export interface ModelComparison {
+  models: {
+    model_id: string;
+    model_type: string;
+    metrics: { rmse: number; mae: number; mape: number };
+    training_time: number;
+  }[];
+  best_model_id: string;
+  ranking_metric: string;
+}
+
+export async function getModelComparison(
+  datasetId: string,
+  metric: string = "rmse"
+): Promise<ModelComparison> {
+  return apiFetch<ModelComparison>(
+    `/api/models/compare/${datasetId}?metric=${metric}`
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Health
 // ---------------------------------------------------------------------------
 export async function healthCheck(): Promise<{
