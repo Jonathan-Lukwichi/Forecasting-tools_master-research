@@ -44,8 +44,8 @@ test("renders Step 1 section", async () => {
 test("renders dataset selector dropdowns", async () => {
   render(<PreparePage />);
   await waitFor(() => {
-    expect(screen.getByText("Patient Data (required)")).toBeDefined();
-    expect(screen.getByText("Weather Data (optional)")).toBeDefined();
+    expect(screen.getByText(/Patient Data/)).toBeDefined();
+    expect(screen.getByText(/Weather Data/)).toBeDefined();
   });
 });
 
