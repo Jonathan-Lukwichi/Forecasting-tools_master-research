@@ -1,0 +1,54 @@
+# === TRIANGULATION RECORD ===
+# Task: CD pipeline for FastAPI backend deployment
+# Vertex 1: Burkov (2020) "ML Engineering" Ch.11 — CI/CD for ML systems
+# Vertex 2: https://docs.railway.com/guides/fastapi — Railway FastAPI guide
+# Vertex 3: docker/Dockerfile.api, api/config.py
+# Verdict: PROCEED
+
+name: Deploy API
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'api/**'
+      - 'app_core/**'
+      - 'requirements*.txt'
+      - 'docker/Dockerfile.api'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports: [6379:6379]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install -r requirements.txt -r requirements-api.txt
+      - name: Run tests
+        env:
+          REDIS_URL: redis://localhost:6379/0
+          SECRET_KEY: test-ci-key
+          SUPABASE_URL: https://placeholder.supabase.co
+          SUPABASE_KEY: placeholder
+        run: pytest tests/ -v --cov=api --cov-fail-under=50
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      # Railway deployment via CLI
+      # Requires RAILWAY_TOKEN secret in GitHub repo settings
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+      - name: Deploy to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: railway up --detach
