@@ -13,6 +13,9 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query
 
 from api.dependencies import get_current_user, get_dataset_store
 from api.schemas.data import (
+    ColumnSummary,
+    EDARequest,
+    EDAResponse,
     FuseRequest,
     FuseResponse,
     FeatureEngineeringRequest,
