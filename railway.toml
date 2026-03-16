@@ -1,12 +1,12 @@
-# Railway deployment configuration for FastAPI backend
-# Docs: https://docs.railway.com/reference/config-as-code
+# Railway deployment — use Nixpacks (auto-detects Python)
+# No Docker needed! Railway reads requirements.txt automatically.
 
 [build]
-builder = "DOCKERFILE"
-dockerfilePath = "docker/Dockerfile.api"
+builder = "NIXPACKS"
+buildCommand = "pip install -r requirements-api.txt"
 
 [deploy]
-startCommand = "uvicorn api.main:app --host 0.0.0.0 --port $PORT --workers 2"
+startCommand = "uvicorn api.main:app --host 0.0.0.0 --port $PORT"
 healthcheckPath = "/health"
 healthcheckTimeout = 30
 restartPolicyType = "ON_FAILURE"
