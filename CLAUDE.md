@@ -10,6 +10,617 @@ This project is **thesis work**. All development MUST follow academic rigor:
 - **Statistical rigour**: Proper train/cal/test splits, conformal prediction intervals, cross-validated metrics
 - **Version control**: Atomic commits, conventional commit messages, no force pushes to main
 
+### Five Mandatory Methodologies
+
+Every piece of work in this project MUST apply these five methodologies. They are not optional.
+
+1. **Automated Git Workflow** — Changes auto-committed and auto-pushed on passing tests
+2. **Self-Healing Prompts** — Failures auto-diagnosed, auto-fixed, and escalated if unresolvable
+3. **Triangulation** — Every approach validated from 3 independent sources before coding begins
+4. **Cross-Validation** — Systematic validation of ALL results (code, data, ML, optimization, UI)
+5. **Reference Fetching** — Consult Kaggle, GitHub, academic books, journal articles, and theses before implementation
+
+See detailed protocols below in [Mandatory Methodologies](#mandatory-methodologies-protocols).
+
+---
+
+## Mandatory Methodologies (Protocols)
+
+### 1. Automated Git Workflow Protocol
+
+**Principle**: No manual git operations. All changes are committed and pushed automatically when quality gates pass.
+
+**Workflow**:
+
+```
+Code Change
+    │
+    ▼
+Pre-commit Hooks (automatic)
+    ├── Python: ruff lint + black format + type check (mypy)
+    ├── TypeScript: eslint + prettier + tsc --noEmit
+    ├── Secrets scan: detect-secrets (block commits with API keys)
+    └── Test: pytest (unit) + vitest (unit)
+    │
+    ▼ (all pass?)
+Auto-Commit (conventional commit message)
+    │
+    ▼
+Pre-push Hooks (automatic)
+    ├── Full test suite: pytest --cov + npm run test:coverage
+    ├── Coverage gate: ≥80% on changed files
+    └── Build check: npm run build (no errors)
+    │
+    ▼ (all pass?)
+Auto-Push to feature branch
+    │
+    ▼
+CI/CD Pipeline (GitHub Actions)
+    ├── Lint + type-check + test (matrix: Python 3.11 + Node 20)
+    ├── Coverage report → PR comment
+    ├── Security audit (npm audit + pip-audit)
+    ├── E2E tests (Playwright) against preview deployment
+    └── Auto-deploy on main merge (Vercel + Railway)
+```
+
+**Implementation — Pre-commit config** (`.pre-commit-config.yaml`):
+
+```yaml
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-lint
+        name: Ruff Lint
+        entry: ruff check --fix
+        language: system
+        types: [python]
+      - id: black-format
+        name: Black Format
+        entry: black
+        language: system
+        types: [python]
+      - id: mypy-check
+        name: Mypy Type Check
+        entry: mypy --ignore-missing-imports
+        language: system
+        types: [python]
+        pass_filenames: false
+      - id: eslint
+        name: ESLint
+        entry: bash -c 'cd frontend && npx eslint'
+        language: system
+        files: '\.(ts|tsx)$'
+      - id: prettier
+        name: Prettier
+        entry: bash -c 'cd frontend && npx prettier --write'
+        language: system
+        files: '\.(ts|tsx|css|json)$'
+      - id: detect-secrets
+        name: Detect Secrets
+        entry: detect-secrets-hook
+        language: system
+      - id: pytest-unit
+        name: Pytest Unit
+        entry: pytest tests/unit/ -x -q
+        language: system
+        pass_filenames: false
+      - id: vitest-unit
+        name: Vitest Unit
+        entry: bash -c 'cd frontend && npx vitest run'
+        language: system
+        pass_filenames: false
+```
+
+**Auto-commit script** (`scripts/auto_commit.sh`):
+
+```bash
+#!/bin/bash
+# Auto-commit and push when all quality gates pass
+# Called by Claude Code after completing a task
+
+set -e
+
+# 1. Stage changes
+git add -A
+
+# 2. Run pre-commit hooks
+pre-commit run --all-files || { echo "QUALITY GATE FAILED — fix issues first"; exit 1; }
+
+# 3. Generate commit message from staged diff
+COMMIT_MSG=$(git diff --cached --stat | head -5)
+
+# 4. Commit
+git commit -m "feat: auto-commit — ${COMMIT_MSG}
+
+Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
+
+# 5. Push to current branch
+git push origin HEAD
+```
+
+**Rules**:
+- NEVER commit directly to `main` — always use feature branches
+- Pre-commit hooks MUST pass before any commit is created
+- Coverage MUST be ≥80% on changed files before push
+- CI MUST be green before merge to main
+- Auto-deploy triggers on main merge only
+
+---
+
+### 2. Self-Healing Prompt Protocol
+
+**Principle**: When code fails (tests, builds, runtime), automatically diagnose the root cause, apply a fix, and re-validate. Escalate to the user only after 3 failed attempts.
+
+**Workflow**:
+
+```
+Error Detected
+    │
+    ▼
+┌─────────────────────────────────┐
+│  STEP 1: DIAGNOSE               │
+│  - Read full error traceback     │
+│  - Identify error category:      │
+│    ├── Import error              │
+│    ├── Type error                │
+│    ├── Test failure              │
+│    ├── Build failure             │
+│    ├── Runtime exception         │
+│    ├── API contract mismatch     │
+│    └── Environment issue         │
+│  - Search codebase for context   │
+│  - Check recent changes (git     │
+│    diff) for regression          │
+└─────────────┬───────────────────┘
+              │
+              ▼
+┌─────────────────────────────────┐
+│  STEP 2: FIX (Attempt 1)        │
+│  - Apply targeted fix            │
+│  - Run affected tests            │
+│  - If PASS → commit + continue   │
+│  - If FAIL → go to Step 3        │
+└─────────────┬───────────────────┘
+              │
+              ▼
+┌─────────────────────────────────┐
+│  STEP 3: ALTERNATIVE FIX (Att 2)│
+│  - Try different approach         │
+│  - Consult reference sources     │
+│    (Kaggle, GitHub, docs)        │
+│  - Run tests again               │
+│  - If PASS → commit + continue   │
+│  - If FAIL → go to Step 4        │
+└─────────────┬───────────────────┘
+              │
+              ▼
+┌─────────────────────────────────┐
+│  STEP 4: DEEP ANALYSIS (Att 3)  │
+│  - Re-read all related files     │
+│  - Check dependency versions     │
+│  - Review architecture docs      │
+│  - Apply comprehensive fix       │
+│  - If PASS → commit + continue   │
+│  - If FAIL → ESCALATE to user    │
+└─────────────┬───────────────────┘
+              │
+              ▼
+┌─────────────────────────────────┐
+│  STEP 5: ESCALATE               │
+│  - Present to user:              │
+│    1. What failed                │
+│    2. What was tried (3 attempts)│
+│    3. Root cause hypothesis      │
+│    4. Proposed options            │
+│  - Wait for user decision        │
+└─────────────────────────────────┘
+```
+
+**Self-healing rules**:
+- ALWAYS read the full error message before attempting a fix
+- ALWAYS run the failing test after each fix attempt to verify
+- NEVER apply the same fix twice — each attempt must be a different approach
+- NEVER suppress errors with try/except without understanding the cause
+- Log every diagnosis and fix attempt for traceability
+- After a successful self-heal, add a regression test to prevent recurrence
+
+**Error category playbook**:
+
+| Error Category | Diagnosis Action | Fix Strategy |
+|---|---|---|
+| Import error | Check installed packages, Python version | Install missing dep, fix import path |
+| Type error (Python) | Read mypy output, check function signatures | Add/fix type annotations, cast correctly |
+| Type error (TS) | Read tsc output, check interface definitions | Regenerate types from OpenAPI, fix interface |
+| Test assertion failure | Compare expected vs actual, check test data | Fix logic bug, update test if spec changed |
+| Build failure (Next.js) | Read build log, check for SSR issues | Fix client/server component boundary |
+| API 500 error | Read FastAPI traceback, check request payload | Fix endpoint logic, validate input |
+| API contract mismatch | Compare Pydantic schema vs TS interface | Regenerate TS types, align schemas |
+| CORS error | Check origin, method, headers config | Update `cors_origins` in Settings |
+| Redis connection | Check URL, container status | Start Redis, fix connection string |
+| TensorFlow error | Check Python version, GPU config | Ensure Python 3.11, set memory limits |
+
+---
+
+### 3. Triangulation Protocol
+
+**Principle**: Before writing ANY implementation code, validate the approach from **3 independent sources** to ensure consistency, relevance, and correctness. This is a mandatory gate — no code is written until triangulation passes.
+
+**The Three Vertices**:
+
+```
+                    ▲ VERTEX 1
+                   ╱ ╲  Academic Literature
+                  ╱   ╲ (Books, Papers, Theses)
+                 ╱     ╲
+                ╱       ╲
+               ╱ APPROACH ╲
+              ╱  VALIDATED  ╲
+             ╱   (3/3 agree) ╲
+            ╱                 ╲
+VERTEX 2   ▼───────────────────▼  VERTEX 3
+Industry Best Practice        Internal Consistency
+(GitHub, Kaggle, Docs)        (Codebase, Architecture)
+```
+
+**Vertex 1 — Academic Literature** (Books, Papers, Theses):
+- Search for peer-reviewed papers or established textbooks covering the technique
+- Verify the approach is theoretically sound for the problem domain
+- Check if the method has known limitations for this use case
+- Sources: Google Scholar, arXiv, IEEE, ACM, Springer, textbooks
+
+**Vertex 2 — Industry Best Practice** (GitHub, Kaggle, Documentation):
+- Search public GitHub repositories for production implementations
+- Search Kaggle notebooks/competitions for applied examples
+- Check official documentation and changelogs
+- Sources: GitHub, Kaggle, Stack Overflow, official docs
+
+**Vertex 3 — Internal Consistency** (Codebase + Architecture):
+- Verify the approach is consistent with existing patterns in `app_core/`
+- Check it doesn't violate architectural decisions in this CLAUDE.md
+- Ensure it integrates with the existing service layer and API contracts
+- Check no circular dependencies or coupling violations
+
+**Triangulation workflow**:
+
+```
+BEFORE writing code for any task:
+
+1. STATE the approach you plan to take (1-2 sentences)
+
+2. VERTEX 1 — Academic validation:
+   - Fetch and cite at least 1 relevant source (book, paper, or thesis)
+   - Confirm theoretical soundness
+   - Note any caveats or limitations
+   - Record: "Academic source: [Author, Year] — [finding]"
+
+3. VERTEX 2 — Industry validation:
+   - Fetch and reference at least 1 GitHub repo or Kaggle notebook
+   - Confirm the pattern is used in production/competition settings
+   - Note any adaptations needed for this project
+   - Record: "Industry source: [repo/notebook URL] — [pattern observed]"
+
+4. VERTEX 3 — Internal validation:
+   - Read relevant existing code in the project
+   - Confirm no conflicts with CLAUDE.md rules or architecture
+   - Confirm integration path with existing services
+   - Record: "Internal check: [file:line] — [consistency confirmed/conflict found]"
+
+5. VERDICT:
+   - 3/3 agree → PROCEED with implementation
+   - 2/3 agree → PROCEED with documented caveat
+   - 1/3 or 0/3 agree → STOP, reconsider approach, re-triangulate
+```
+
+**Triangulation documentation template** (add as code comment or ADR):
+
+```python
+# === TRIANGULATION RECORD ===
+# Task: [description]
+# Approach: [chosen approach]
+#
+# Vertex 1 (Academic):
+#   Source: [Author (Year). "Title". Journal/Book. DOI/ISBN]
+#   Finding: [what the source says about this approach]
+#   Relevance: [how it applies to our case]
+#
+# Vertex 2 (Industry):
+#   Source: [GitHub repo URL or Kaggle notebook URL]
+#   Pattern: [what pattern they use and why]
+#   Adaptation: [how we adapted it for HealthForecast AI]
+#
+# Vertex 3 (Internal):
+#   Files checked: [file:line references]
+#   Consistency: [confirmed/conflict — details]
+#
+# Verdict: PROCEED / PROCEED WITH CAVEAT / REJECTED
+# =============================
+```
+
+**Triangulation is REQUIRED for**:
+- Any new ML model or algorithm implementation
+- Any new API endpoint design
+- Any state management pattern
+- Any database schema change
+- Any authentication/security decision
+- Any deployment infrastructure choice
+- Any third-party library selection
+- Any deviation from existing patterns
+
+---
+
+### 4. Cross-Validation Protocol
+
+**Principle**: Every result — code, data, model, optimization, UI — must be validated through multiple independent checks. Never trust a single test or metric.
+
+**4.1 Code Cross-Validation**:
+
+```
+Every code change must pass ALL of:
+├── Static analysis: ruff + mypy (Python) / eslint + tsc (TypeScript)
+├── Unit tests: isolated component/function tests
+├── Integration tests: multi-component workflow tests
+├── Contract tests: API request/response schema validation
+├── Snapshot tests: UI component render consistency (Vitest)
+└── Build verification: production build succeeds (npm run build)
+```
+
+**4.2 Data Cross-Validation**:
+
+```
+Every data pipeline step must verify:
+├── Schema validation: column names, types, ranges (Pydantic / Zod)
+├── Statistical checks: row count, null %, distribution shape
+├── Temporal consistency: no future data leaking into training set
+├── Referential integrity: all foreign keys resolve
+├── Idempotency: running the pipeline twice produces identical output
+└── Boundary checks: min/max values within clinical plausibility
+```
+
+**4.3 ML Model Cross-Validation**:
+
+```
+Every trained model must be validated by:
+├── K-Fold temporal cross-validation (TimeSeriesSplit, k=5)
+│   ├── Expanding window: train on [0..t], test on [t+1..t+h]
+│   └── Report mean ± std for each metric across folds
+├── Multiple metrics (never rely on a single metric):
+│   ├── RMSE — scale-dependent error magnitude
+│   ├── MAE — robust to outliers
+│   ├── MAPE — percentage error (interpretable)
+│   ├── R² — variance explained
+│   └── Coverage — prediction interval calibration (conformal)
+├── Residual diagnostics:
+│   ├── Normality test (Shapiro-Wilk or Jarque-Bera)
+│   ├── Autocorrelation test (Ljung-Box)
+│   ├── Heteroscedasticity check (visual + Breusch-Pagan)
+│   └── No remaining signal in residuals
+├── Comparison against baselines:
+│   ├── Naive forecast (last value repeated)
+│   ├── Seasonal naive (same day last week)
+│   └── Historical mean
+├── Stability check:
+│   ├── Train with 3 different seeds → metrics within ±5%
+│   └── Train on 80% vs 90% data → consistent ranking
+└── Out-of-sample holdout:
+    └── Final test set NEVER used during development (only for thesis reporting)
+```
+
+**4.4 Optimization Cross-Validation**:
+
+```
+Every MILP solution must verify:
+├── Feasibility: all constraints satisfied (PuLP status == "Optimal")
+├── Sensitivity analysis: vary key parameters ±10%, check solution stability
+├── Bound verification: objective value between relaxed LP and naive heuristic
+├── Constraint audit: manually verify 3 random time periods satisfy all constraints
+├── Alternative solver: solve with CBC and GLPK, compare objective values
+└── Business sense check: does the schedule/order plan look reasonable to a human?
+```
+
+**4.5 UI Cross-Validation**:
+
+```
+Every frontend page must verify:
+├── Component tests: renders correctly with mock data (Vitest)
+├── API integration: correct data flow from backend (MSW mock)
+├── Visual regression: screenshot comparison (Playwright)
+├── Accessibility: axe-core audit passes (no critical/serious violations)
+├── Responsive: renders on 1024px, 1440px, 1920px widths
+├── Error states: displays correctly when API returns 4xx/5xx
+├── Loading states: shows skeleton/spinner during fetch
+└── Empty states: handles zero-data gracefully
+```
+
+**Cross-validation reporting template**:
+
+```markdown
+## Cross-Validation Report — [Component/Model Name]
+
+### Summary
+- Component: [name]
+- Date: [YYYY-MM-DD]
+- Status: PASS / FAIL / PARTIAL
+
+### Results
+| Validation Layer | Status | Details |
+|---|---|---|
+| Static analysis | ✅/❌ | [details] |
+| Unit tests | ✅/❌ | [X/Y passed, coverage %] |
+| Integration tests | ✅/❌ | [details] |
+| [ML/Optimization specific checks] | ✅/❌ | [details] |
+
+### Issues Found
+- [issue 1 — how resolved]
+- [issue 2 — how resolved]
+
+### Conclusion
+[1-2 sentences on overall quality assessment]
+```
+
+---
+
+### 5. Reference Fetching Protocol
+
+**Principle**: Before implementing any significant feature, consult external references to ensure best practices are followed. This applies to ML workflows, data engineering, frontend patterns, and infrastructure.
+
+**Reference sources (ranked by priority)**:
+
+#### 5.1 Academic Sources (Books, Papers, Theses)
+
+**Mandatory references for this project's domain**:
+
+| Topic | Key References |
+|---|---|
+| **Time Series Forecasting** | Hyndman & Athanasopoulos (2021). *Forecasting: Principles and Practice*, 3rd ed. OTexts. (Free: otexts.com/fpp3) |
+| **ARIMA/SARIMAX** | Box, Jenkins, Reinsel & Ljung (2015). *Time Series Analysis: Forecasting and Control*, 5th ed. Wiley. |
+| **LSTM for Time Series** | Brownlee, J. (2018). *Deep Learning for Time Series Forecasting*. Machine Learning Mastery. |
+| **XGBoost** | Chen & Guestrin (2016). "XGBoost: A Scalable Tree Boosting System". *KDD '16*. doi:10.1145/2939672.2939785 |
+| **Hybrid Models** | Zhang, G.P. (2003). "Time series forecasting using a hybrid ARIMA and neural network model". *Neurocomputing*, 50, 159-175. |
+| **Conformal Prediction** | Vovk, Gammerman & Shafer (2005). *Algorithmic Learning in a Random World*. Springer. |
+| **Operations Research** | Hillier & Lieberman (2021). *Introduction to Operations Research*, 11th ed. McGraw-Hill. |
+| **MILP Staff Scheduling** | Ernst et al. (2004). "Staff scheduling and rostering: A review of applications, methods and models". *EJOR*, 153(1), 3-27. |
+| **Healthcare Forecasting** | Kadri et al. (2014). "Time series modelling and forecasting of emergency department overcrowding". *J Med Syst*, 38, 107. |
+| **ED Demand Prediction** | Marcilio et al. (2013). "Forecasting daily emergency department visits using calendar variables and ambient temperature readings". *Acad Emerg Med*, 20(8), 769-777. |
+| **Seasonal Decomposition** | Cleveland et al. (1990). "STL: A Seasonal-Trend Decomposition Procedure Based on Loess". *J Official Stats*, 6(1), 3-73. |
+| **Software Engineering** | Martin, R.C. (2008). *Clean Code: A Handbook of Agile Software Craftsmanship*. Prentice Hall. |
+| **ML Engineering** | Burkov, A. (2020). *Machine Learning Engineering*. True Positive Inc. |
+| **ML System Design** | Huyen, C. (2022). *Designing Machine Learning Systems*. O'Reilly. |
+| **Statistical Learning** | Hastie, Tibshirani & Friedman (2009). *The Elements of Statistical Learning*, 2nd ed. Springer. (Free: hastie.su.domains/ElemStatLearn) |
+| **Deep Learning** | Goodfellow, Bengio & Courville (2016). *Deep Learning*. MIT Press. (Free: deeplearningbook.org) |
+| **Feature Engineering** | Zheng & Casari (2018). *Feature Engineering for Machine Learning*. O'Reilly. |
+| **Full-Stack Development** | Next.js Documentation — nextjs.org/docs (official, always current) |
+| **API Design** | Masse, M. (2011). *REST API Design Rulebook*. O'Reilly. |
+
+**How to search for additional references**:
+```
+Search strategy for any new technique:
+1. Google Scholar: "[technique name] [domain]" (e.g., "LSTM emergency department forecasting")
+2. arXiv: cs.LG or stat.ML categories
+3. IEEE Xplore / ACM Digital Library: conference papers
+4. Springer / Elsevier: journal articles
+5. University thesis repositories: ProQuest, EThOS, HAL
+6. Filter: prefer papers cited ≥50 times, published within last 10 years
+```
+
+#### 5.2 Industry Sources (GitHub + Kaggle)
+
+**How to fetch GitHub references**:
+```
+Search pattern:
+1. GitHub Search: "[technique] [framework] [language]"
+   Examples:
+   - "time series forecasting fastapi python"
+   - "LSTM patient arrivals hospital"
+   - "nextjs dashboard recharts tailwind"
+   - "celery background task training ml"
+   - "MILP staff scheduling pulp"
+
+2. Filter criteria:
+   - Stars ≥ 50 (quality signal)
+   - Updated within last 2 years (not abandoned)
+   - Has tests (quality signal)
+   - Has LICENSE file (legal use)
+
+3. What to extract:
+   - Project structure and architecture patterns
+   - Testing strategies
+   - Error handling patterns
+   - API design patterns
+   - Deployment configurations
+```
+
+**How to fetch Kaggle references**:
+```
+Search pattern:
+1. Kaggle Notebooks: "[technique] [domain]"
+   Examples:
+   - "emergency department forecasting"
+   - "hospital demand prediction LSTM"
+   - "time series hybrid model"
+   - "XGBoost forecasting feature engineering"
+   - "conformal prediction intervals"
+
+2. Kaggle Competitions:
+   - "Tabular Playground Series" (time series tasks)
+   - "Store Sales - Time Series Forecasting"
+   - "Web Traffic Time Series Forecasting"
+   - "M5 Forecasting" (hierarchical time series)
+
+3. Filter criteria:
+   - Upvotes ≥ 20 (community validated)
+   - Medal-winning notebooks preferred
+   - Competition top-10% solutions preferred
+
+4. What to extract:
+   - Feature engineering techniques
+   - Model ensembling strategies
+   - Evaluation methodologies
+   - Data preprocessing patterns
+   - Hyperparameter ranges and tuning strategies
+```
+
+#### 5.3 Official Documentation Sources
+
+| Technology | Documentation URL | What to Check |
+|---|---|---|
+| Next.js | nextjs.org/docs | App Router patterns, middleware, SSR |
+| React | react.dev | Hooks, Server Components, best practices |
+| Tailwind CSS | tailwindcss.com/docs | Utility classes, dark mode, customization |
+| FastAPI | fastapi.tiangolo.com | Dependencies, WebSocket, background tasks |
+| TanStack Query | tanstack.com/query | Queries, mutations, caching strategies |
+| Zustand | docs.pmnd.rs/zustand | Store patterns, middleware, persistence |
+| Celery | docs.celeryq.dev | Task routing, error handling, monitoring |
+| PuLP | coin-or.github.io/pulp | MILP modelling, solver options |
+| TensorFlow | tensorflow.org/api_docs | Keras layers, callbacks, saving models |
+| XGBoost | xgboost.readthedocs.io | Parameters, early stopping, feature importance |
+| Optuna | optuna.readthedocs.io | Study, samplers, pruners |
+| statsmodels | statsmodels.org | ARIMA, SARIMAX, diagnostics |
+| Supabase | supabase.com/docs | Auth, RLS, Storage, Edge Functions |
+| Playwright | playwright.dev/docs | Test patterns, selectors, assertions |
+| Vitest | vitest.dev/guide | Configuration, mocking, coverage |
+
+#### 5.4 Reference Fetching Workflow
+
+```
+BEFORE implementing any feature:
+
+1. IDENTIFY the core technique(s) involved
+   Example: "Implementing LSTM+XGBoost hybrid for ED forecasting"
+
+2. FETCH ACADEMIC REFERENCE (Vertex 1 of Triangulation):
+   - Search Google Scholar / textbook index for the technique
+   - Read abstract + methodology section
+   - Record citation in triangulation comment
+   - Use WebSearch or WebFetch tools to access sources
+
+3. FETCH INDUSTRY REFERENCE (Vertex 2 of Triangulation):
+   - Search GitHub for production implementations
+     → Use WebSearch: "site:github.com [technique] [stack]"
+   - Search Kaggle for applied notebooks
+     → Use WebSearch: "site:kaggle.com [technique] [domain]"
+   - Record URL and key pattern observed
+
+4. CHECK OFFICIAL DOCS:
+   - Read relevant section of framework docs
+   - Verify API usage is current (not deprecated)
+   - Record any version-specific notes
+
+5. SYNTHESIZE:
+   - Do all sources agree on the approach? → Proceed
+   - Sources conflict? → Document the conflict and choose with rationale
+   - No sources found? → This is a novel approach — document extra carefully
+```
+
+**Reference fetching is REQUIRED for**:
+- Any ML model implementation or modification
+- Any new data processing pipeline step
+- Any API architecture decision
+- Any frontend state management pattern
+- Any database schema design
+- Any deployment or infrastructure choice
+- Any third-party library selection
+- Any statistical test or validation methodology
+
 ---
 
 ## Project Overview
