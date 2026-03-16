@@ -53,11 +53,9 @@ test("displays best model information", async () => {
   });
 });
 
-test("displays comparison table", async () => {
+test("renders rank metric selector", async () => {
   render(<ResultsPage />);
   await waitFor(() => {
-    // Check that the ranking header exists
-    expect(screen.getByText("RMSE")).toBeDefined();
-    expect(screen.getByText("MAE")).toBeDefined();
+    expect(screen.getByText("Rank by RMSE")).toBeDefined();
   });
 });
