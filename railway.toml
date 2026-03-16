@@ -1,13 +1,14 @@
-# Railway deployment — use Nixpacks (auto-detects Python)
-# No Docker needed! Railway reads requirements.txt automatically.
+# Railway deployment — simple Python, no Docker needed
+# Railway auto-detects Python from runtime.txt (Python 3.11)
+# and installs from requirements.txt
 
 [build]
 builder = "NIXPACKS"
-buildCommand = "pip install -r requirements-api.txt"
+buildCommand = "pip install -r requirements-deploy.txt && pip install -r requirements-api.txt"
 
 [deploy]
 startCommand = "uvicorn api.main:app --host 0.0.0.0 --port $PORT"
 healthcheckPath = "/health"
-healthcheckTimeout = 30
+healthcheckTimeout = 60
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
