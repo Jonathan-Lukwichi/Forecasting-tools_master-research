@@ -1378,25 +1378,41 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
 ## Critical Rules
 
+### Architecture Rules
+
 1. **NEVER rewrite `app_core/` in TypeScript.** ML/optimization stays in Python. The frontend communicates via the FastAPI REST API only.
 
 2. **NEVER commit secrets.** No API keys, passwords, or tokens in source code. Use `.env` + environment variables. The FastAPI `api/config.py` Settings class loads from env.
 
-3. **NEVER skip tests.** Every PR must include tests for new functionality. CI must be green before merge.
+3. **ALWAYS use the service layer.** Frontend → API route → service/worker → app_core. No direct app_core imports from API routes (use services).
 
-4. **ALWAYS use deterministic seeds.** `np.random.seed(42)`, `tf.random.set_seed(42)`, `random.seed(42)` in all ML code and test fixtures.
+4. **ALWAYS handle errors gracefully.** API returns structured error responses. Frontend shows user-friendly error messages. Never expose stack traces.
 
-5. **ALWAYS pin dependency versions.** No `^` or `~` ranges. Use exact versions in `requirements.txt` and `package.json` for reproducibility.
+5. **Background jobs for anything > 5 seconds.** Model training, optimization, and large data processing must use Celery. Never block the API process.
 
-6. **ALWAYS generate TypeScript types from Pydantic schemas.** Never manually duplicate API contracts. Use `openapi-typescript` to generate from the OpenAPI spec.
+### Methodology Rules (MANDATORY — Thesis Requirements)
 
-7. **ALWAYS use the service layer.** Frontend → API route → service/worker → app_core. No direct app_core imports from API routes (use services).
+6. **NEVER skip triangulation.** Before writing ANY implementation code, the approach MUST be validated from 3 independent sources (academic, industry, internal). No exceptions. See [Triangulation Protocol](#3-triangulation-protocol).
 
-8. **ALWAYS handle errors gracefully.** API returns structured error responses. Frontend shows user-friendly error messages. Never expose stack traces.
+7. **NEVER skip cross-validation.** Every result (code, data, model, optimization, UI) MUST pass multiple independent validation checks. A single passing test is not sufficient. See [Cross-Validation Protocol](#4-cross-validation-protocol).
 
-9. **Background jobs for anything > 5 seconds.** Model training, optimization, and large data processing must use Celery. Never block the API process.
+8. **NEVER implement without reference fetching.** Before coding any significant feature, MUST consult at least 1 academic source AND 1 industry source (GitHub/Kaggle). Record citations. See [Reference Fetching Protocol](#5-reference-fetching-protocol).
 
-10. **Document every architectural decision.** If you choose approach A over B, write a comment or ADR explaining why. This is thesis work.
+9. **ALWAYS apply self-healing.** When code fails, follow the 3-attempt diagnosis-and-fix protocol before escalating to the user. Never give up after 1 try. Never apply the same fix twice. See [Self-Healing Prompt Protocol](#2-self-healing-prompt-protocol).
+
+10. **ALWAYS auto-commit via the workflow.** All changes go through pre-commit hooks → quality gates → auto-commit → auto-push. No manual git operations that bypass quality checks. See [Automated Git Workflow Protocol](#1-automated-git-workflow-protocol).
+
+### Quality Rules
+
+11. **NEVER skip tests.** Every PR must include tests for new functionality. CI must be green before merge. Minimum 80% coverage on new code.
+
+12. **ALWAYS use deterministic seeds.** `np.random.seed(42)`, `tf.random.set_seed(42)`, `random.seed(42)` in all ML code and test fixtures.
+
+13. **ALWAYS pin dependency versions.** No `^` or `~` ranges. Use exact versions in `requirements.txt` and `package.json` for reproducibility.
+
+14. **ALWAYS generate TypeScript types from Pydantic schemas.** Never manually duplicate API contracts. Use `openapi-typescript` to generate from the OpenAPI spec.
+
+15. **Document every architectural decision.** If you choose approach A over B, write a triangulation record and/or ADR explaining why. This is thesis work — every decision must be traceable and justified.
 
 ---
 
