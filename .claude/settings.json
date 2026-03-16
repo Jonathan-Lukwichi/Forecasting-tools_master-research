@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python \".claude/hooks/auto_commit.py\""
+            "command": "python \"C:/Users/u22872966/Desktop/StreamlitProject/.claude/hooks/auto_commit.py\""
           }
         ]
       }
