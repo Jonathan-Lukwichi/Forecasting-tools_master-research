@@ -94,7 +94,7 @@ def get_job_status(
     _user: dict = Depends(get_current_user),
 ) -> dict[str, Any]:
     """Poll the status of a background job."""
-    result = celery_app.AsyncResult(job_id)
+    result = _get_celery().AsyncResult(job_id)
 
     if result.state == "PENDING":
         return {"job_id": job_id, "status": "queued", "progress": 0.0, "message": "Waiting in queue..."}
@@ -157,7 +157,7 @@ async def job_progress_ws(websocket: WebSocket, job_id: str):
 
     try:
         while True:
-            result = celery_app.AsyncResult(job_id)
+            result = _get_celery().AsyncResult(job_id)
 
             if result.state == "PENDING":
                 await websocket.send_json({"status": "queued", "progress": 0.0, "message": "Waiting..."})
