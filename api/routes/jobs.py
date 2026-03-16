@@ -137,7 +137,7 @@ def cancel_job(
     _user: dict = Depends(get_current_user),
 ) -> dict[str, Any]:
     """Cancel a running or queued job."""
-    celery_app.control.revoke(job_id, terminate=True)
+    _get_celery().control.revoke(job_id, terminate=True)
     return {"job_id": job_id, "cancelled": True}
 
 
