@@ -1,0 +1,126 @@
+# === TRIANGULATION RECORD ===
+# Task: Docker Compose for full local development stack
+# Approach: FastAPI + Celery worker + Redis + PostgreSQL + Next.js
+#
+# Vertex 1 (Academic):
+#   Source: Huyen, C. (2022). "Designing Machine Learning Systems", Ch.7 & 9. O'Reilly.
+#   Finding: Local dev should mirror production topology; use containers for all services
+#   Relevance: Ensures reproducibility — same stack locally and in cloud
+#
+# Vertex 2 (Industry):
+#   Source: https://testdriven.io/courses/fastapi-celery/docker/
+#   Pattern: Separate services for API, worker, Redis, DB. Shared network. Health checks.
+#   Adaptation: Added PostgreSQL for Supabase-compatible local dev
+#
+# Vertex 3 (Internal):
+#   Files checked: api/config.py (redis_url, supabase_url), .env
+#   Consistency: Confirmed — Settings loads from env, CORS allows localhost:3000
+#
+# Verdict: PROCEED
+# =============================
+
+services:
+  # ---------- PostgreSQL (Supabase-compatible) ----------
+  db:
+    image: postgres:16-alpine
+    container_name: hf-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: healthforecast
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------- Redis (Celery broker + cache) ----------
+  redis:
+    image: redis:7-alpine
+    container_name: hf-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------- FastAPI Backend ----------
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: hf-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/healthforecast
+    volumes:
+      # Mount source code for hot-reload in development
+      - ./api:/app/api
+      - ./app_core:/app/app_core
+      - ./pipeline_artifacts:/app/pipeline_artifacts
+      - ./data:/app/data
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # ---------- Celery Worker (background ML/optimization jobs) ----------
+  worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: hf-worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/healthforecast
+    volumes:
+      - ./api:/app/api
+      - ./app_core:/app/app_core
+      - ./pipeline_artifacts:/app/pipeline_artifacts
+      - ./data:/app/data
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A api.workers.celery_app worker --loglevel=info --concurrency=2
+
+  # ---------- Flower (Celery monitoring dashboard) ----------
+  flower:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: hf-flower
+    restart: unless-stopped
+    ports:
+      - "5555:5555"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: celery -A api.workers.celery_app flower --port=5555
+
+volumes:
+  pgdata:
+  redisdata:
