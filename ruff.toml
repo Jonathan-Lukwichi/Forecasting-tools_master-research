@@ -1,0 +1,44 @@
+# Ruff configuration for HealthForecast AI
+# Ruff replaces Black (formatter) + Flake8 (linter) + isort (import sorting)
+# See: https://docs.astral.sh/ruff/
+
+[lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort (import sorting)
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "S",    # flake8-bandit (security)
+    "T20",  # flake8-print (no print statements)
+    "SIM",  # flake8-simplify
+    "RUF",  # ruff-specific rules
+]
+
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "S101",   # assert used (OK in tests)
+    "T201",   # print found (OK in scripts)
+    "B008",   # function call in default arg (FastAPI Depends pattern)
+]
+
+[lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "T201"]  # Allow assert and print in tests
+"scripts/**/*.py" = ["T201"]         # Allow print in scripts
+"api/routes/**/*.py" = ["B008"]      # Allow Depends() in FastAPI routes
+
+[lint.isort]
+known-first-party = ["api", "app_core"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+# Target Python 3.11
+target-version = "py311"
+
+# Include these directories
+include = ["api/**/*.py", "app_core/**/*.py", "tests/**/*.py", "scripts/**/*.py"]
