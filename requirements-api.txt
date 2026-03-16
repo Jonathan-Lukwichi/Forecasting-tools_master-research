@@ -1,0 +1,40 @@
+# FastAPI backend dependencies (pinned for reproducibility)
+# These are ADDITIONAL to requirements.txt (which has ML/data deps)
+
+# Web framework
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+python-multipart==0.0.20
+
+# Auth
+PyJWT==2.10.1
+bcrypt==4.3.0
+passlib[bcrypt]==1.7.4
+
+# Settings
+pydantic-settings==2.8.1
+
+# Background tasks
+celery[redis]==5.4.0
+redis==5.2.1
+flower==2.0.1
+
+# Database (async)
+asyncpg==0.30.0
+sqlalchemy[asyncio]==2.0.40
+
+# HTTP client
+httpx==0.28.1
+
+# Testing
+pytest==8.3.5
+pytest-cov==6.1.1
+pytest-asyncio==0.25.3
+httpx==0.28.1
+
+# Code quality
+ruff==0.11.6
+mypy==1.15.0
+
+# OpenAPI type generation
+datamodel-code-generator==0.28.2
