@@ -532,6 +532,39 @@ export async function optimizeInventory(
 }
 
 // ---------------------------------------------------------------------------
+// AI Recommendations
+// ---------------------------------------------------------------------------
+export interface RecommendationRequest {
+  dataset_id: string;
+  context: string; // "staff" | "supply" | "general"
+  forecast_summary?: Record<string, unknown>;
+  optimization_summary?: Record<string, unknown>;
+}
+
+export interface Recommendation {
+  priority: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+  action: string;
+  rationale: string;
+  category: string;
+  impact: string;
+}
+
+export interface RecommendationResponse {
+  recommendations: Recommendation[];
+  generated_at: string;
+  model_used: string;
+}
+
+export async function getRecommendations(
+  body: RecommendationRequest
+): Promise<RecommendationResponse> {
+  return apiFetch<RecommendationResponse>("/api/ai/recommendations", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Health
 // ---------------------------------------------------------------------------
 export async function healthCheck(): Promise<{
