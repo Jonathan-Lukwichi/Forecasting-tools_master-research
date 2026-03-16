@@ -135,3 +135,24 @@ pip-delete-this-directory.txt
 
 # Model Artifacts (large files, saved locally)
 pipeline_artifacts/
+
+# ---------- Frontend (Next.js) ----------
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/coverage/
+frontend/playwright-report/
+frontend/test-results/
+
+# ---------- Docker ----------
+docker/tmp/
+
+# ---------- Uploads ----------
+uploads/
+
+# ---------- Coverage reports ----------
+coverage-backend.xml
+openapi.json
+
+# ---------- Secrets baseline ----------
+# .secrets.baseline is committed (it contains hashes, not secrets)
