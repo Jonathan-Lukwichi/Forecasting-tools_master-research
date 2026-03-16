@@ -1,10 +1,10 @@
-# Railway deployment — simple Python, no Docker needed
-# Railway auto-detects Python from runtime.txt (Python 3.11)
-# and installs from requirements.txt
+# Railway deployment — lightweight API only
+# IMPORTANT: We override the install to skip the heavy requirements.txt
+# (which has TensorFlow 2GB+, Prophet, etc.)
 
 [build]
 builder = "NIXPACKS"
-buildCommand = "pip install -r requirements-deploy.txt && pip install -r requirements-api.txt"
+buildCommand = "pip install -r requirements-deploy.txt"
 
 [deploy]
 startCommand = "uvicorn api.main:app --host 0.0.0.0 --port $PORT"
