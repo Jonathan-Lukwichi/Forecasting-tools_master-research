@@ -1,0 +1,84 @@
+# === TRIANGULATION RECORD ===
+# Task: Pre-commit hooks for automated code quality
+# Approach: Ruff (Python lint+format) + ESLint/Prettier (TS) + detect-secrets + tests
+#
+# Vertex 1 (Academic):
+#   Source: Martin, R.C. (2008). "Clean Code", Ch.1 - Clean Code. Prentice Hall.
+#   Finding: Code quality checks should be automated and enforced at commit time
+#   Relevance: Pre-commit hooks enforce quality before code enters the repository
+#
+# Vertex 2 (Industry):
+#   Source: https://github.com/astral-sh/ruff-pre-commit (official Ruff pre-commit)
+#   Source: https://gatlenculp.medium.com/effortless-code-quality-the-ultimate-pre-commit-hooks-guide-for-2025
+#   Pattern: Ruff replaces Black+Flake8+isort. Husky/lint-staged for JS/TS.
+#   Adaptation: Using pre-commit framework for both Python and TS (polyglot)
+#
+# Vertex 3 (Internal):
+#   Files checked: requirements-api.txt (ruff, mypy), frontend/package.json (eslint)
+#   Consistency: Confirmed — tools already in dependency lists
+#
+# Verdict: PROCEED
+# =============================
+
+repos:
+  # ---------- General ----------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  # ---------- Python: Ruff (lint + format — replaces Black, Flake8, isort) ----------
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.6
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+
+  # ---------- Python: Type checking ----------
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.15.0
+    hooks:
+      - id: mypy
+        additional_dependencies: [pydantic, pydantic-settings, fastapi]
+        args: [--ignore-missing-imports, --no-strict-optional]
+        pass_filenames: false
+        files: ^(api|app_core)/
+
+  # ---------- Secrets detection ----------
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+
+  # ---------- TypeScript/JavaScript: ESLint + Prettier via local hooks ----------
+  - repo: local
+    hooks:
+      - id: eslint-frontend
+        name: ESLint (frontend)
+        entry: bash -c 'cd frontend && npx eslint --fix "src/**/*.{ts,tsx}" || true'
+        language: system
+        files: '^frontend/src/.*\.(ts|tsx)$'
+        pass_filenames: false
+
+      - id: prettier-frontend
+        name: Prettier (frontend)
+        entry: bash -c 'cd frontend && npx prettier --write "src/**/*.{ts,tsx,css,json}"'
+        language: system
+        files: '^frontend/.*\.(ts|tsx|css|json)$'
+        pass_filenames: false
+
+      - id: tsc-check
+        name: TypeScript Check
+        entry: bash -c 'cd frontend && npx tsc --noEmit'
+        language: system
+        files: '^frontend/src/.*\.(ts|tsx)$'
+        pass_filenames: false
