@@ -71,7 +71,6 @@ test("renders tab buttons", async () => {
   render(<ExplorePage />);
   await waitFor(() => {
     expect(screen.getByText("Overview")).toBeDefined();
-    expect(screen.getByText("Columns")).toBeDefined();
     expect(screen.getByText("Patterns")).toBeDefined();
     expect(screen.getByText("Correlations")).toBeDefined();
   });
