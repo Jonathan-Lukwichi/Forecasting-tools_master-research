@@ -33,9 +33,14 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 
 from api.dependencies import get_current_user
-from api.workers.celery_app import celery_app
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
+
+
+def _get_celery():
+    """Lazy import Celery app to avoid import errors when Celery is not installed."""
+    from api.workers.celery_app import celery_app
+    return celery_app
 
 
 # ---------------------------------------------------------------------------
