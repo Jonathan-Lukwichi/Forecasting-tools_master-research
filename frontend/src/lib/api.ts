@@ -410,6 +410,128 @@ export async function getModelComparison(
 }
 
 // ---------------------------------------------------------------------------
+// Forecast
+// ---------------------------------------------------------------------------
+export interface ForecastRequest {
+  dataset_id: string;
+  model_id: string;
+  horizons?: number[];
+  include_intervals?: boolean;
+  confidence_level?: number;
+}
+
+export interface ForecastPrediction {
+  horizon: number;
+  forecast: number;
+  lower?: number | null;
+  upper?: number | null;
+}
+
+export interface ForecastResponse {
+  forecast_id: string;
+  model_name: string;
+  horizons: number[];
+  predictions: ForecastPrediction[];
+  category_breakdown?: Record<string, unknown>[] | null;
+}
+
+export async function generateForecast(
+  body: ForecastRequest
+): Promise<ForecastResponse> {
+  return apiFetch<ForecastResponse>("/api/forecast/predict", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Staff Optimization
+// ---------------------------------------------------------------------------
+export interface StaffOptimizeRequest {
+  dataset_id: string;
+  planning_horizon?: number;
+  overtime_multiplier?: number;
+  understaffing_penalty?: number;
+  overstaffing_penalty?: number;
+  min_staff_per_shift?: number;
+  max_overtime_hours?: number;
+  shift_hours?: number;
+}
+
+export interface StaffOptimizeResponse {
+  status: string;
+  is_optimal: boolean;
+  solve_time: number;
+  total_cost: number;
+  regular_labor_cost: number;
+  overtime_cost: number;
+  understaffing_penalty: number;
+  overstaffing_penalty: number;
+  staff_schedule: Record<string, unknown>[];
+  daily_summary: Record<string, unknown>[];
+  num_variables: number;
+  num_constraints: number;
+}
+
+export async function optimizeStaff(
+  body: StaffOptimizeRequest
+): Promise<StaffOptimizeResponse> {
+  return apiFetch<StaffOptimizeResponse>("/api/optimize/staff", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Inventory Optimization
+// ---------------------------------------------------------------------------
+export interface InventoryItem {
+  item_id: string;
+  name: string;
+  category: string;
+  unit_cost: number;
+  holding_cost_rate?: number;
+  ordering_cost?: number;
+  stockout_penalty?: number;
+  lead_time?: number;
+  usage_rate?: number;
+  min_order_qty?: number;
+  max_order_qty?: number;
+  criticality?: string;
+}
+
+export interface InventoryOptimizeRequest {
+  dataset_id: string;
+  items: InventoryItem[];
+  planning_horizon?: number;
+  storage_capacity?: number;
+  daily_budget?: number;
+}
+
+export interface InventoryOptimizeResponse {
+  status: string;
+  is_optimal: boolean;
+  solve_time: number;
+  total_cost: number;
+  ordering_cost: number;
+  holding_cost: number;
+  stockout_cost: number;
+  order_schedule: Record<string, unknown>[];
+  inventory_levels: Record<string, unknown>[];
+  reorder_alerts: Record<string, unknown>[];
+  service_level: number;
+}
+
+export async function optimizeInventory(
+  body: InventoryOptimizeRequest
+): Promise<InventoryOptimizeResponse> {
+  return apiFetch<InventoryOptimizeResponse>("/api/optimize/inventory", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Health
 // ---------------------------------------------------------------------------
 export async function healthCheck(): Promise<{
