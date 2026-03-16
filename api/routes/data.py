@@ -242,6 +242,158 @@ def engineer_features(
 
 
 # ---------------------------------------------------------------------------
+# EDA (Exploratory Data Analysis)
+# ---------------------------------------------------------------------------
+@router.post("/explore", response_model=EDAResponse)
+def explore_dataset(
+    body: EDARequest,
+    _user: dict = Depends(get_current_user),
+    store: DatasetStore = Depends(get_dataset_store),
+):
+    """
+    Compute exploratory data analysis statistics for a dataset.
+
+    === TRIANGULATION RECORD ===
+    Task: EDA endpoint for dataset exploration
+    Approach: Compute summary stats, correlations, DOW/monthly patterns server-side
+
+    Vertex 1 (Academic):
+      Source: Hyndman & Athanasopoulos (2021). "Forecasting: Principles and Practice", Ch.2.
+      Finding: EDA for time series must include seasonal patterns (DOW, monthly),
+               autocorrelation, and trend decomposition
+      Relevance: DOW + monthly averages capture seasonal patterns in ED arrivals
+
+    Vertex 2 (Industry):
+      Source: https://www.kaggle.com/code/raminhuseyn/time-series-forecasting-exploratory-data-analysis
+      Pattern: Summary stats + correlation matrix + temporal aggregations
+      Adaptation: Return JSON-serializable stats for frontend charting
+
+    Vertex 3 (Internal):
+      Files checked: pages/04_Explore_Data.py (DOW donut, monthly donut, weather correlation)
+      Consistency: Confirmed — replicates same computations via API
+
+    Verdict: PROCEED
+    =============================
+    """
+    import numpy as np
+
+    try:
+        entry = store.get(body.dataset_id)
+    except KeyError:
+        raise HTTPException(404, "Dataset not found")
+
+    df = entry.df
+    target = body.target_column
+
+    # Detect date column
+    date_col = None
+    for candidate in ["Date", "datetime", "date", "timestamp", "ds"]:
+        if candidate in df.columns:
+            date_col = candidate
+            break
+
+    # Column summaries
+    summaries = []
+    for col in df.columns:
+        s = df[col]
+        summary = ColumnSummary(
+            name=col,
+            dtype=str(s.dtype),
+            non_null=int(s.notna().sum()),
+            null_count=int(s.isna().sum()),
+            null_pct=round(float(s.isna().mean() * 100), 2),
+            unique=int(s.nunique()),
+        )
+        if pd.api.types.is_numeric_dtype(s):
+            desc = s.describe()
+            summary.mean = round(float(desc.get("mean", 0)), 4)
+            summary.std = round(float(desc.get("std", 0)), 4)
+            summary.min = round(float(desc.get("min", 0)), 4)
+            summary.max = round(float(desc.get("max", 0)), 4)
+        summaries.append(summary)
+
+    # Numeric columns
+    numeric_cols = [c for c in df.columns if pd.api.types.is_numeric_dtype(df[c])]
+
+    # Correlations with target
+    correlations: dict[str, float] = {}
+    if target in df.columns and pd.api.types.is_numeric_dtype(df[target]):
+        corr_series = df[numeric_cols].corr()[target].drop(target, errors="ignore")
+        top_corr = corr_series.abs().nlargest(body.top_correlations)
+        correlations = {
+            col: round(float(corr_series[col]), 4) for col in top_corr.index
+        }
+
+    # Missing by column
+    missing = {
+        col: round(float(df[col].isna().mean() * 100), 2)
+        for col in df.columns
+        if df[col].isna().any()
+    }
+
+    # Target stats
+    target_stats: dict[str, float] = {}
+    if target in df.columns and pd.api.types.is_numeric_dtype(df[target]):
+        ts = df[target].dropna()
+        target_stats = {
+            "mean": round(float(ts.mean()), 2),
+            "std": round(float(ts.std()), 2),
+            "min": round(float(ts.min()), 2),
+            "max": round(float(ts.max()), 2),
+            "median": round(float(ts.median()), 2),
+        }
+
+    # DOW averages
+    dow_averages: dict[str, float] = {}
+    if date_col and target in df.columns:
+        try:
+            dt_series = pd.to_datetime(df[date_col], errors="coerce")
+            temp = df[[target]].copy()
+            temp["_dow"] = dt_series.dt.day_name()
+            dow_avg = temp.groupby("_dow")[target].mean()
+            day_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+            dow_averages = {
+                d: round(float(dow_avg.get(d, 0)), 2)
+                for d in day_order if d in dow_avg.index
+            }
+        except Exception:
+            pass
+
+    # Monthly averages
+    monthly_averages: dict[str, float] = {}
+    if date_col and target in df.columns:
+        try:
+            dt_series = pd.to_datetime(df[date_col], errors="coerce")
+            temp = df[[target]].copy()
+            temp["_month"] = dt_series.dt.month_name()
+            month_avg = temp.groupby("_month")[target].mean()
+            month_order = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December",
+            ]
+            monthly_averages = {
+                m: round(float(month_avg.get(m, 0)), 2)
+                for m in month_order if m in month_avg.index
+            }
+        except Exception:
+            pass
+
+    return EDAResponse(
+        dataset_id=body.dataset_id,
+        rows=len(df),
+        columns=len(df.columns),
+        column_summaries=summaries,
+        correlations=correlations,
+        missing_by_column=missing,
+        target_stats=target_stats,
+        dow_averages=dow_averages,
+        monthly_averages=monthly_averages,
+        numeric_columns=numeric_cols,
+        date_column=date_col,
+    )
+
+
+# ---------------------------------------------------------------------------
 # List datasets
 # ---------------------------------------------------------------------------
 @router.get("/datasets")
