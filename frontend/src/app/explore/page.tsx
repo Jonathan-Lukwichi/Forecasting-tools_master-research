@@ -267,7 +267,7 @@ export default function ExplorePage() {
                   <h3 className="mb-3 text-sm font-bold text-white">Day-of-Week Distribution</h3>
                   <ResponsiveContainer width="100%" height={280}>
                     <PieChart>
-                      <Pie data={pieData} dataKey="avg" nameKey="day" cx="50%" cy="50%" outerRadius={100} label={({ day, avg }: { day: string; avg: number }) => `${day}: ${avg}`}>
+                      <Pie data={pieData} dataKey="avg" nameKey="day" cx="50%" cy="50%" outerRadius={100} label={(props) => `${props.day}: ${props.avg}`}>
                         {pieData.map((entry, i) => (
                           <Cell key={i} fill={entry.fill} />
                         ))}
