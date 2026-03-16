@@ -19,13 +19,13 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 # ---------------------------------------------------------------------------
 DEMO_USERS = {
     "admin": {
-        "password": "$2b$12$LJ3m4ys3GZfnMRHMxUwMmOF.bR1UBQEfMcSKIj6lLmyUDG/xxMGS",  # admin123
+        "password": "$2b$12$gBLay74nzVhDUW8EKqRU2eaJRAL533qC3YSUi8CzfQgu28gTsDFKy",  # admin123
         "name": "Admin User",
         "role": "admin",
         "email": "admin@healthforecast.ai",
     },
     "user1": {
-        "password": "$2b$12$LJ3m4ys3GZfnMRHMxUwMmOF.bR1UBQEfMcSKIj6lLmyUDG/xxMGS",  # user123
+        "password": "$2b$12$yNb55acgtMR8prs5RaFMx.5hijzKv9Gv40zsCcVs0IaT7L/pXCd.a",  # user123
         "name": "Dr. Smith",
         "role": "user",
         "email": "smith@hospital.org",
