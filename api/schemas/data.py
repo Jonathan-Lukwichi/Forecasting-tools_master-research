@@ -79,6 +79,45 @@ class FeatureEngineeringResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # Feature Selection
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# EDA (Exploratory Data Analysis)
+# ---------------------------------------------------------------------------
+class EDARequest(BaseModel):
+    dataset_id: str
+    target_column: str = "ED"
+    top_correlations: int = 10
+
+
+class ColumnSummary(BaseModel):
+    name: str
+    dtype: str
+    non_null: int
+    null_count: int
+    null_pct: float
+    unique: int
+    mean: float | None = None
+    std: float | None = None
+    min: float | None = None
+    max: float | None = None
+
+
+class EDAResponse(BaseModel):
+    dataset_id: str
+    rows: int
+    columns: int
+    column_summaries: list[ColumnSummary]
+    correlations: dict[str, float]  # column → correlation with target
+    missing_by_column: dict[str, float]  # column → missing %
+    target_stats: dict[str, float]  # mean, std, min, max, median
+    dow_averages: dict[str, float]  # Monday→Sunday average
+    monthly_averages: dict[str, float]  # Jan→Dec average
+    numeric_columns: list[str]
+    date_column: str | None = None
+
+
+# ---------------------------------------------------------------------------
+# Feature Selection
+# ---------------------------------------------------------------------------
 class FeatureSelectionRequest(BaseModel):
     dataset_id: str
     method: str = "permutation"  # "permutation", "shap", "mutual_info"
