@@ -1,0 +1,68 @@
+# === TRIANGULATION RECORD ===
+# Task: Dockerize Next.js frontend
+# Approach: Multi-stage build following Next.js official Docker example
+#
+# Vertex 1 (Academic):
+#   Source: Martin, R.C. (2008). "Clean Code", Ch.12 - Emergence. Prentice Hall.
+#   Finding: Build systems should be simple, deterministic, and reproducible
+#   Relevance: Multi-stage Docker ensures deterministic builds
+#
+# Vertex 2 (Industry):
+#   Source: https://nextjs.org/docs/app/getting-started/deploying (Next.js official)
+#   Pattern: deps → build → runner stages, standalone output, non-root user
+#   Adaptation: Standard Next.js Docker pattern, no changes needed
+#
+# Vertex 3 (Internal):
+#   Files checked: frontend/package.json, frontend/next.config.ts
+#   Consistency: Confirmed — Next.js 16.1.6, standard build output
+#
+# Verdict: PROCEED
+# =============================
+
+# ---------- Stage 1: Dependencies ----------
+FROM node:20-alpine AS deps
+WORKDIR /app
+
+COPY frontend/package.json frontend/package-lock.json* ./
+RUN npm ci --ignore-scripts
+
+# ---------- Stage 2: Build ----------
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY frontend/ .
+
+# Build arguments for environment variables
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+RUN npm run build
+
+# ---------- Stage 3: Runtime ----------
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Security: non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
+EXPOSE 3000
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["node", "server.js"]
