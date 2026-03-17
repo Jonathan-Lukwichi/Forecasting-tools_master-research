@@ -24,16 +24,16 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/upload", label: "Upload Data", icon: Upload },
-  { href: "/prepare", label: "Prepare Data", icon: Layers },
-  { href: "/explore", label: "Explore Data", icon: BarChart3 },
-  { href: "/train", label: "Train Models", icon: Cpu },
-  { href: "/results", label: "Model Results", icon: Trophy },
-  { href: "/forecast", label: "Forecast", icon: TrendingUp },
-  { href: "/staff", label: "Staff Planner", icon: Users },
-  { href: "/supply", label: "Supply Planner", icon: Package },
-  { href: "/actions", label: "Action Center", icon: Zap },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, step: 0 },
+  { href: "/upload", label: "Upload Data", icon: Upload, step: 1 },
+  { href: "/prepare", label: "Prepare Data", icon: Layers, step: 2 },
+  { href: "/explore", label: "Explore Data", icon: BarChart3, step: 3 },
+  { href: "/train", label: "Train Models", icon: Cpu, step: 4 },
+  { href: "/results", label: "Model Results", icon: Trophy, step: 5 },
+  { href: "/forecast", label: "Forecast", icon: TrendingUp, step: 6 },
+  { href: "/staff", label: "Staff Planner", icon: Users, step: 7 },
+  { href: "/supply", label: "Supply Planner", icon: Package, step: 8 },
+  { href: "/actions", label: "Action Center", icon: Zap, step: 9 },
 ];
 
 export default function Sidebar() {
