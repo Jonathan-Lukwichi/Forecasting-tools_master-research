@@ -1,14 +1,14 @@
 /**
- * KPI Card — Figma-inspired design adapted for dark theme.
+ * KPI Card — healthcare white theme.
  *
- * Layout matches the Figma "01_Dashboard_Vertical":
- *   ┌──────────────────────────────────┐
- *   │ LABEL                  ↑ 6.7%   │
- *   │                       Increase   │
- *   │ 157,367                          │
- *   │                                  │
- *   │ ▂▅▇▃▆▅▇▂▅▇  (sparkline)         │
- *   └──────────────────────────────────┘
+ * Layout:
+ *   +---------------------------------+
+ *   | LABEL                  ^ 6.7%   |
+ *   |                       Increase  |
+ *   | 157,367                         |
+ *   |                                 |
+ *   | (sparkline)                     |
+ *   +---------------------------------+
  */
 "use client";
 
@@ -27,13 +27,13 @@ interface KpiCardProps {
   label: string;
   value: string | number;
   trend?: {
-    value: number; // e.g. 6.7
+    value: number;
     direction: "up" | "down";
   };
   sparkline?: number[];
   sparklineType?: "bar" | "line" | "area";
-  color?: string; // tailwind color class or hex
-  accentHex?: string; // hex for sparkline
+  color?: string;
+  accentHex?: string;
 }
 
 export default function KpiCard({
@@ -42,28 +42,23 @@ export default function KpiCard({
   trend,
   sparkline,
   sparklineType = "bar",
-  color = "text-cyan-400",
-  accentHex = "#22d3ee",
+  color = "text-blue-600",
+  accentHex = "#2563eb",
 }: KpiCardProps) {
   const chartData = sparkline?.map((v, i) => ({ i, v })) ?? [];
 
   const trendColor =
-    trend?.direction === "up" ? "text-emerald-400" : "text-red-400";
+    trend?.direction === "up" ? "text-emerald-600" : "text-red-500";
   const trendBg =
     trend?.direction === "up"
-      ? "bg-emerald-400/10 border-emerald-400/20"
-      : "bg-red-400/10 border-red-400/20";
+      ? "bg-emerald-50 border-emerald-200"
+      : "bg-red-50 border-red-200";
 
   return (
-    <div className="group relative rounded-2xl border border-white/[0.08] bg-gradient-to-br from-slate-900/80 via-slate-900/95 to-slate-800/80 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.15] hover:shadow-lg hover:shadow-cyan-500/5">
-      {/* Shimmer overlay */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
-        <div className="absolute -left-full top-0 h-full w-full animate-shimmer bg-gradient-to-r from-transparent via-white/[0.03] to-transparent" />
-      </div>
-
+    <div className="group relative rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md">
       {/* Header: label + trend */}
       <div className="relative flex items-start justify-between">
-        <span className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">
+        <span className="text-[11px] font-semibold uppercase tracking-widest text-slate-500">
           {label}
         </span>
         {trend && (
