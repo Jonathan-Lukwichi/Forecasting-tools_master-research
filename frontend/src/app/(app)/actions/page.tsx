@@ -31,6 +31,8 @@ import {
   type Recommendation,
   type RecommendationResponse,
 } from "@/lib/api";
+import PageHeader from "@/components/ui/PageHeader";
+import FadeIn from "@/components/ui/FadeIn";
 
 const PRIORITY_CONFIG = {
   CRITICAL: { color: "text-red-500", bg: "bg-red-50", border: "border-red-200", icon: ShieldAlert },
