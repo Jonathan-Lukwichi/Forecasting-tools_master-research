@@ -83,17 +83,9 @@ export default function ActionsPage() {
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-extrabold text-slate-900">Action Center</h1>
-            <p className="mt-1 text-sm text-slate-500">AI-powered recommendations for hospital resource management</p>
-          </div>
-          <button onClick={() => router.push("/dashboard")} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 hover:border-slate-300 hover:bg-slate-50">
-            Dashboard
-          </button>
-        </div>
+        <PageHeader title="Action Center" description="AI-powered recommendations tailored to your hospital's situation" icon={Zap} badge="Step 9" accentColor="violet" />
 
+        <FadeIn delay={0.15}>
         {/* Controls */}
         <div className="flex flex-wrap items-center gap-3">
           <select value={selectedId} onChange={(e) => setSelectedId(e.target.value)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-blue-400 focus:outline-none">
