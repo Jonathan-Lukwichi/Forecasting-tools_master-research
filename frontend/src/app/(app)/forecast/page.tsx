@@ -74,6 +74,7 @@ export default function ForecastPage() {
           icon={TrendingUp}
           badge="Step 6"
           accentColor="blue"
+          images={["/images/forecast-bg.jpg"]}
         />
         <div className="flex justify-end -mt-2">
           <button onClick={() => router.push("/staff")} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 hover:border-slate-300 hover:bg-slate-50">
