@@ -67,16 +67,9 @@ export default function StaffPage() {
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-extrabold text-slate-900">Staff Planner</h1>
-            <p className="mt-1 text-sm text-slate-500">MILP-optimized staff scheduling</p>
-          </div>
-          <button onClick={() => router.push("/supply")} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 hover:border-slate-300 hover:bg-slate-50">
-            Supply Planner <ArrowRight size={14} />
-          </button>
-        </div>
+        <PageHeader title="Staff Planner" description="Optimize staff schedules to balance coverage, costs, and patient safety" icon={Users} badge="Step 7" accentColor="emerald" />
 
+        <FadeIn delay={0.15}>
         {/* Config */}
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <h2 className="mb-4 text-sm font-bold text-slate-800">Configuration</h2>
