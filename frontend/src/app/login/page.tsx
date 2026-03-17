@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { login } from "@/lib/api";
 import { ArrowLeft } from "lucide-react";
+import HeartbeatLogo from "@/components/ui/HeartbeatLogo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,7 +19,6 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       await login(username, password);
       router.push("/dashboard");
@@ -29,77 +30,88 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-      <div className="w-full max-w-sm">
-        {/* Back to welcome */}
-        <Link
-          href="/"
-          className="mb-6 inline-flex items-center gap-1.5 text-sm text-slate-500 transition-colors hover:text-blue-600"
-        >
-          <ArrowLeft size={14} />
-          Back to Home
-        </Link>
-
-        {/* Logo */}
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-sky-400 text-2xl font-extrabold text-white shadow-lg shadow-blue-200">
-            H
-          </div>
-          <h1 className="text-2xl font-extrabold text-slate-800">
-            HealthForecast AI
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Hospital demand forecasting
-          </p>
-        </div>
-
-        {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
-        >
-          {error && (
-            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
-              {error}
+    <div className="flex min-h-screen">
+      {/* Left panel — image (hidden on mobile) */}
+      <div className="relative hidden w-1/2 lg:block">
+        <Image
+          src="/images/login-bg2.jpg"
+          alt="Healthcare technology"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/85 via-blue-800/70 to-sky-900/60" />
+        <div className="relative flex h-full flex-col justify-between p-10">
+          <Link href="/" className="flex items-center gap-3">
+            <HeartbeatLogo size={40} />
+            <div>
+              <div className="text-lg font-bold text-white">HealthForecast AI</div>
+              <div className="text-xs text-blue-200">Hospital Resource Planning</div>
             </div>
-          )}
+          </Link>
+          <div>
+            <h2 className="text-3xl font-bold leading-tight text-white">
+              Smarter decisions.<br />Better patient outcomes.
+            </h2>
+            <p className="mt-3 max-w-md text-sm leading-relaxed text-blue-100/80">
+              AI-powered forecasting and optimization platform for South African hospitals. Predict demand, plan staff, and manage supplies with confidence.
+            </p>
+            {/* Heartbeat line decoration */}
+            <div className="mt-6 opacity-30">
+              <svg viewBox="0 0 400 40" fill="none" className="h-8 w-64">
+                <path d="M0 20h80l15-16 20 32 15-16 20 32 15-16h80l15-16 20 32 15-16h80" stroke="white" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </div>
+          </div>
+          <div className="text-xs text-blue-200/60">
+            &copy; 2026 HealthForecast AI — Master Thesis Prototype
+          </div>
+        </div>
+      </div>
 
-          <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">
-            Username
-          </label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="mb-4 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100"
-            placeholder="admin"
-            required
-          />
+      {/* Right panel — form */}
+      <div className="flex flex-1 flex-col justify-center bg-slate-50 px-6 sm:px-12 lg:px-16">
+        <div className="mx-auto w-full max-w-sm">
+          {/* Mobile header image */}
+          <div className="relative -mx-6 -mt-8 mb-8 h-40 overflow-hidden rounded-b-3xl sm:-mx-12 lg:hidden">
+            <Image src="/images/login-bg2.jpg" alt="" fill className="object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-b from-blue-900/70 to-blue-900/90" />
+            <div className="relative flex h-full items-end p-6">
+              <div className="flex items-center gap-3">
+                <HeartbeatLogo size={36} className="shadow-lg" />
+                <div className="text-base font-bold text-white">HealthForecast AI</div>
+              </div>
+            </div>
+          </div>
 
-          <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">
-            Password
-          </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="mb-6 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100"
-            placeholder="••••••••"
-            required
-          />
+          <Link href="/" className="mb-6 inline-flex items-center gap-1.5 text-sm text-slate-500 transition-colors hover:text-blue-600">
+            <ArrowLeft size={14} />
+            Back to Home
+          </Link>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-sky-500 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md disabled:opacity-50"
-          >
-            {loading ? "Signing in..." : "Sign in"}
-          </button>
+          <div className="mb-6 hidden lg:block">
+            <h1 className="text-2xl font-bold text-slate-800">Welcome back</h1>
+            <p className="mt-1 text-sm text-slate-500">Sign in to your dashboard</p>
+          </div>
 
-          <p className="mt-4 text-center text-xs text-slate-400">
-            Demo: admin / admin123
-          </p>
-        </form>
+          <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            {error && (
+              <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">{error}</div>
+            )}
+
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Username</label>
+            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="mb-4 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50" placeholder="admin" required />
+
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Password</label>
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mb-6 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50" placeholder="••••••••" required />
+
+            <button type="submit" disabled={loading} className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-sky-500 py-3 text-sm font-semibold text-white shadow-md shadow-blue-200 transition-all hover:shadow-lg disabled:opacity-50">
+              {loading ? "Signing in..." : "Sign in"}
+            </button>
+
+            <p className="mt-4 text-center text-xs text-slate-400">Demo: admin / admin123</p>
+          </form>
+        </div>
       </div>
     </div>
   );
