@@ -189,6 +189,7 @@ export default function TrainPage() {
           icon={Cpu}
           badge="Step 4"
           accentColor="violet"
+          images={["/images/train-bg.jpg"]}
         />
         <div className="flex justify-end -mt-2">
           <button
