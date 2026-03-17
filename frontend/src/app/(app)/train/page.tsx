@@ -420,6 +420,7 @@ export default function TrainPage() {
             )}
           </div>
         )}
+        </FadeIn>
       </div>
     </div>
   );
