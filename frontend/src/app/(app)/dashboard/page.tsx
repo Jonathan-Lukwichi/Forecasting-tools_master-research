@@ -156,17 +156,19 @@ export default function DashboardPage() {
         />
 
         {/* KPI Cards */}
-        <KpiGrid
-          todayForecast={kpis.today_forecast}
-          weekTotal={kpis.week_total_forecast}
-          peakDay={kpis.peak_day_forecast}
-          peakDayName={kpis.peak_day_name}
-          historicalAvg={kpis.historical_avg_ed}
-          hasForecast={kpis.has_forecast}
-          hasHistorical={kpis.has_historical}
-          forecastTrend={sparklineTrend}
-          dailyPattern={sparklinePattern}
-        />
+        <FadeIn delay={0.1}>
+          <KpiGrid
+            todayForecast={kpis.today_forecast}
+            weekTotal={kpis.week_total_forecast}
+            peakDay={kpis.peak_day_forecast}
+            peakDayName={kpis.peak_day_name}
+            historicalAvg={kpis.historical_avg_ed}
+            hasForecast={kpis.has_forecast}
+            hasHistorical={kpis.has_historical}
+            forecastTrend={sparklineTrend}
+            dailyPattern={sparklinePattern}
+          />
+        </FadeIn>
 
         {/* Charts row */}
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
