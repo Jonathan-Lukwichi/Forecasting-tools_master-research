@@ -128,7 +128,12 @@ export default function WelcomePage() {
         </motion.div>
 
         {/* Hero visual — floating dashboard preview */}
-        <div className="relative mx-auto mt-12 max-w-5xl sm:mt-16">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="relative mx-auto mt-12 max-w-5xl sm:mt-16"
+        >
           <div className="rounded-2xl border border-slate-200 bg-white p-1 shadow-xl shadow-slate-200/50">
             <div className="rounded-xl bg-slate-50 p-4 sm:p-6">
               {/* Mock dashboard header */}
