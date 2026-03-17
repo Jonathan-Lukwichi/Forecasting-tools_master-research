@@ -3,6 +3,8 @@
  */
 "use client";
 
+import HeartbeatLogo from "@/components/ui/HeartbeatLogo";
+
 interface DashboardHeaderProps {
   title: string;
   subtitle: string;
@@ -19,9 +21,7 @@ export default function DashboardHeader({
       <div className="relative flex flex-wrap items-center justify-between gap-4">
         {/* Brand */}
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/20 text-xl font-extrabold text-white shadow-lg backdrop-blur-sm">
-            H
-          </div>
+          <HeartbeatLogo size={40} />
           <div>
             <h1 className="text-2xl font-extrabold tracking-tight text-white">
               {title}
