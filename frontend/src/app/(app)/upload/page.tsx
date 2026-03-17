@@ -22,6 +22,8 @@ import {
   type DatasetInfo,
   type UserInfo,
 } from "@/lib/api";
+import PageHeader from "@/components/ui/PageHeader";
+import FadeIn from "@/components/ui/FadeIn";
 
 type DatasetType = "patient" | "weather" | "calendar" | "reason";
 
