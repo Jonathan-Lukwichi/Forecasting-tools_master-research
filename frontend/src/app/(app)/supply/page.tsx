@@ -112,7 +112,7 @@ export default function SupplyPage() {
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50">
                     {["Name", "Category", "Unit Cost", "Stockout Pen.", "Lead Time", "Criticality", ""].map((h) => (
-                      <th key={h} className="px-2 py-2 text-left font-semibold text-slate-600">{h}</th>
+                      <th key={h} className="px-2 py-2 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">{h}</th>
                     ))}
                   </tr>
                 </thead>
