@@ -177,41 +177,23 @@ export default function DashboardPage() {
             <ChartCard title="Patient Arrivals — Trend" icon="📈" className="lg:col-span-2">
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
+                  <AreaChart
                     data={kpis.forecast_trend.map((d) => ({
                       date: (d as { date: string }).date,
                       patients: (d as { actual?: number }).actual ?? 0,
                     }))}
                   >
-                    <XAxis
-                      dataKey="date"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fill: "#64748b", fontSize: 11 }}
-                    />
-                    <YAxis
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fill: "#64748b", fontSize: 11 }}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        background: "#ffffff",
-                        border: "1px solid #e2e8f0",
-                        borderRadius: "8px",
-                        color: "#1e293b",
-                        fontSize: "12px",
-                        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                      }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="patients"
-                      stroke="#2563eb"
-                      strokeWidth={2}
-                      dot={{ r: 3, fill: "#2563eb" }}
-                    />
-                  </LineChart>
+                    <defs>
+                      <linearGradient id="colorPatients" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 11 }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 11 }} />
+                    <Tooltip contentStyle={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", color: "#1e293b", fontSize: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }} />
+                    <Area type="monotone" dataKey="patients" stroke="#2563eb" strokeWidth={2.5} fill="url(#colorPatients)" dot={{ r: 4, fill: "#2563eb", strokeWidth: 2, stroke: "#fff" }} activeDot={{ r: 6, fill: "#2563eb", stroke: "#fff", strokeWidth: 2 }} />
+                  </AreaChart>
                 </ResponsiveContainer>
               </div>
             </ChartCard>
