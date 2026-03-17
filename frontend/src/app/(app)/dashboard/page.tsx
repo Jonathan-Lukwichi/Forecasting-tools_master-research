@@ -232,9 +232,8 @@ export default function DashboardPage() {
                     />
                     <Bar
                       dataKey="avg_ed"
-                      fill="#0ea5e9"
+                      fill="url(#colorBar)"
                       radius={[4, 4, 0, 0]}
-                      opacity={0.8}
                     />
                   </BarChart>
                 </ResponsiveContainer>
