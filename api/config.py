@@ -30,7 +30,11 @@ class Settings(BaseSettings):
     llm_api_key: str = ""
 
     # CORS
-    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:3001"]
+    cors_origins: list[str] = [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "https://healthforecast-ai.vercel.app",
+    ]
 
     # File uploads
     max_upload_size_mb: int = 50
