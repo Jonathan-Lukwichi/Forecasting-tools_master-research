@@ -348,6 +348,7 @@ export default function UploadPage() {
             </div>
           </div>
         </div>
+        </FadeIn>
       </div>
     </div>
   );
