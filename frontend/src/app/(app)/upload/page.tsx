@@ -152,10 +152,10 @@ export default function UploadPage() {
           onDragOver={onDragOver}
           onDragLeave={onDragLeave}
           onDrop={onDrop}
-          className={`relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-12 transition-all ${
+          className={`relative flex min-h-[200px] flex-col items-center justify-center rounded-2xl border-2 border-dashed p-12 transition-all ${
             dragOver
               ? "border-blue-400 bg-blue-50"
-              : "border-slate-300 bg-white hover:border-slate-400"
+              : "border-slate-300 bg-white hover:border-blue-400 hover:bg-blue-50/30"
           } ${uploading ? "pointer-events-none opacity-50" : "cursor-pointer"}`}
           onClick={() => document.getElementById("file-input")?.click()}
         >
