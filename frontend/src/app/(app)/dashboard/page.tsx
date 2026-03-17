@@ -171,87 +171,89 @@ export default function DashboardPage() {
         </FadeIn>
 
         {/* Charts row */}
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          {/* Patient arrivals trend */}
-          <ChartCard title="Patient Arrivals — Trend" icon="📈" className="lg:col-span-2">
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={kpis.forecast_trend.map((d) => ({
-                    date: (d as { date: string }).date,
-                    patients: (d as { actual?: number }).actual ?? 0,
-                  }))}
-                >
-                  <XAxis
-                    dataKey="date"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: "#64748b", fontSize: 11 }}
-                  />
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: "#64748b", fontSize: 11 }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      background: "#ffffff",
-                      border: "1px solid #e2e8f0",
-                      borderRadius: "8px",
-                      color: "#1e293b",
-                      fontSize: "12px",
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                    }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="patients"
-                    stroke="#2563eb"
-                    strokeWidth={2}
-                    dot={{ r: 3, fill: "#2563eb" }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </ChartCard>
+        <FadeIn delay={0.2}>
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+            {/* Patient arrivals trend */}
+            <ChartCard title="Patient Arrivals — Trend" icon="📈" className="lg:col-span-2">
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={kpis.forecast_trend.map((d) => ({
+                      date: (d as { date: string }).date,
+                      patients: (d as { actual?: number }).actual ?? 0,
+                    }))}
+                  >
+                    <XAxis
+                      dataKey="date"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: "#64748b", fontSize: 11 }}
+                    />
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: "#64748b", fontSize: 11 }}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        background: "#ffffff",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "8px",
+                        color: "#1e293b",
+                        fontSize: "12px",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="patients"
+                      stroke="#2563eb"
+                      strokeWidth={2}
+                      dot={{ r: 3, fill: "#2563eb" }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </ChartCard>
 
-          {/* Day-of-week pattern */}
-          <ChartCard title="Day-of-Week Pattern" icon="📅">
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={kpis.daily_ed_pattern}>
-                  <XAxis
-                    dataKey="day"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: "#64748b", fontSize: 11 }}
-                  />
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: "#64748b", fontSize: 11 }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      background: "#ffffff",
-                      border: "1px solid #e2e8f0",
-                      borderRadius: "8px",
-                      color: "#1e293b",
-                      fontSize: "12px",
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                    }}
-                  />
-                  <Bar
-                    dataKey="avg_ed"
-                    fill="#0ea5e9"
-                    radius={[4, 4, 0, 0]}
-                    opacity={0.8}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </ChartCard>
-        </div>
+            {/* Day-of-week pattern */}
+            <ChartCard title="Day-of-Week Pattern" icon="📅">
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={kpis.daily_ed_pattern}>
+                    <XAxis
+                      dataKey="day"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: "#64748b", fontSize: 11 }}
+                    />
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: "#64748b", fontSize: 11 }}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        background: "#ffffff",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "8px",
+                        color: "#1e293b",
+                        fontSize: "12px",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                      }}
+                    />
+                    <Bar
+                      dataKey="avg_ed"
+                      fill="#0ea5e9"
+                      radius={[4, 4, 0, 0]}
+                      opacity={0.8}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </ChartCard>
+          </div>
+        </FadeIn>
 
         {/* Secondary stats row */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
