@@ -1,10 +1,27 @@
 #!/usr/bin/env python3
-"""Auto-commit hook for Claude Code - commits and pushes after file edits."""
+"""
+Auto-commit hook for Claude Code — commits after file edits.
+
+Branch-aware workflow (CLAUDE.md compliance):
+- On a feature branch: auto-commit + auto-push to that branch
+- On main: auto-commit locally only (NO push) — forces use of PRs
+"""
 import json
 import sys
 import subprocess
 import os
 from datetime import datetime
+
+
+def get_current_branch(project_dir):
+    """Return the name of the current git branch."""
+    result = subprocess.run(
+        ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+        capture_output=True,
+        text=True,
+        cwd=project_dir,
+    )
+    return result.stdout.strip() if result.returncode == 0 else "main"
 
 
 def main():
@@ -37,7 +54,7 @@ def main():
     # Check if there are staged changes
     result = subprocess.run(
         ["git", "diff", "--cached", "--quiet"],
-        capture_output=True
+        capture_output=True,
     )
 
     if result.returncode == 0:
@@ -50,14 +67,19 @@ def main():
     # Commit
     subprocess.run(
         ["git", "commit", "-m", commit_msg],
-        capture_output=True
+        capture_output=True,
     )
 
-    # Push to origin main
-    subprocess.run(
-        ["git", "push", "origin", "main"],
-        capture_output=True
-    )
+    # Branch-aware push:
+    #   feature branch → push to that branch (safe, isolated)
+    #   main           → do NOT push (requires PR to merge)
+    branch = get_current_branch(project_dir)
+
+    if branch != "main":
+        subprocess.run(
+            ["git", "push", "origin", branch],
+            capture_output=True,
+        )
 
     sys.exit(0)
 
