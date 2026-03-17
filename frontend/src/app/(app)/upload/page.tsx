@@ -109,19 +109,19 @@ export default function UploadPage() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-950 px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-extrabold text-white">Upload Data</h1>
-            <p className="mt-1 text-sm text-slate-400">
+            <h1 className="text-2xl font-extrabold text-slate-900">Upload Data</h1>
+            <p className="mt-1 text-sm text-slate-500">
               Upload CSV, Excel, or Parquet files to start forecasting
             </p>
           </div>
           <button
             onClick={() => router.push("/dashboard")}
-            className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-slate-900/80 px-4 py-2 text-sm text-slate-300 transition-colors hover:border-white/[0.15]"
+            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 transition-colors hover:border-slate-300"
           >
             Dashboard <ArrowRight size={14} />
           </button>
@@ -135,12 +135,12 @@ export default function UploadPage() {
               onClick={() => setSelectedType(type.value)}
               className={`rounded-xl border p-3 text-left transition-all ${
                 selectedType === type.value
-                  ? "border-cyan-400/40 bg-cyan-400/5"
-                  : "border-white/[0.06] bg-slate-900/60 hover:border-white/[0.12]"
+                  ? "border-blue-300 bg-blue-50"
+                  : "border-slate-200 bg-white hover:border-slate-300"
               }`}
             >
               <span className="text-lg">{type.icon}</span>
-              <div className="mt-1 text-sm font-semibold text-white">
+              <div className="mt-1 text-sm font-semibold text-slate-800">
                 {type.label}
               </div>
               <div className="text-[11px] text-slate-500">
@@ -157,8 +157,8 @@ export default function UploadPage() {
           onDrop={onDrop}
           className={`relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-12 transition-all ${
             dragOver
-              ? "border-cyan-400 bg-cyan-400/5"
-              : "border-white/[0.1] bg-slate-900/40 hover:border-white/[0.2]"
+              ? "border-blue-400 bg-blue-50"
+              : "border-slate-300 bg-white hover:border-slate-400"
           } ${uploading ? "pointer-events-none opacity-50" : "cursor-pointer"}`}
           onClick={() => document.getElementById("file-input")?.click()}
         >
@@ -172,16 +172,16 @@ export default function UploadPage() {
 
           {uploading ? (
             <>
-              <div className="mb-3 h-10 w-10 animate-spin rounded-full border-2 border-cyan-400 border-t-transparent" />
-              <p className="text-sm text-slate-400">Uploading…</p>
+              <div className="mb-3 h-10 w-10 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+              <p className="text-sm text-slate-500">Uploading…</p>
             </>
           ) : (
             <>
               <CloudUpload
                 size={40}
-                className={`mb-3 ${dragOver ? "text-cyan-400" : "text-slate-600"}`}
+                className={`mb-3 ${dragOver ? "text-blue-600" : "text-slate-400"}`}
               />
-              <p className="text-sm font-medium text-slate-300">
+              <p className="text-sm font-medium text-slate-700">
                 Drag & drop your file here
               </p>
               <p className="mt-1 text-xs text-slate-500">
@@ -193,7 +193,7 @@ export default function UploadPage() {
 
         {/* Error */}
         {error && (
-          <div className="flex items-center gap-2 rounded-lg border border-red-400/20 bg-red-400/5 px-4 py-3 text-sm text-red-400">
+          <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-500">
             <AlertCircle size={16} />
             {error}
           </div>
@@ -201,25 +201,25 @@ export default function UploadPage() {
 
         {/* Upload result */}
         {uploadResult && (
-          <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/5 p-5">
-            <div className="mb-3 flex items-center gap-2 text-emerald-400">
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+            <div className="mb-3 flex items-center gap-2 text-emerald-500">
               <CheckCircle2 size={18} />
               <span className="font-semibold">Upload successful</span>
             </div>
             <div className="mb-4 grid grid-cols-3 gap-4 text-sm">
               <div>
                 <span className="text-slate-500">File</span>
-                <div className="font-medium text-white">{uploadResult.filename}</div>
+                <div className="font-medium text-slate-800">{uploadResult.filename}</div>
               </div>
               <div>
                 <span className="text-slate-500">Rows</span>
-                <div className="font-mono font-medium text-white">
+                <div className="font-mono font-medium text-slate-800">
                   {uploadResult.rows.toLocaleString()}
                 </div>
               </div>
               <div>
                 <span className="text-slate-500">Columns</span>
-                <div className="font-mono font-medium text-white">
+                <div className="font-mono font-medium text-slate-800">
                   {uploadResult.columns.length}
                 </div>
               </div>
@@ -234,7 +234,7 @@ export default function UploadPage() {
                 {uploadResult.columns.map((col) => (
                   <span
                     key={col}
-                    className="rounded-md border border-white/[0.06] bg-slate-800 px-2 py-0.5 text-xs text-slate-300"
+                    className="rounded-md border border-slate-200 bg-white px-2 py-0.5 text-xs text-slate-600"
                   >
                     {col}
                   </span>
@@ -243,14 +243,14 @@ export default function UploadPage() {
             </div>
 
             {/* Preview table */}
-            <div className="overflow-x-auto rounded-lg border border-white/[0.06]">
+            <div className="overflow-x-auto rounded-lg border border-slate-200">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="border-b border-white/[0.06] bg-slate-800/50">
+                  <tr className="border-b border-slate-200 bg-slate-50">
                     {uploadResult.columns.map((col) => (
                       <th
                         key={col}
-                        className="whitespace-nowrap px-3 py-2 text-left font-semibold text-slate-400"
+                        className="whitespace-nowrap px-3 py-2 text-left font-semibold text-slate-500"
                       >
                         {col}
                       </th>
@@ -261,10 +261,10 @@ export default function UploadPage() {
                   {uploadResult.preview.map((row, i) => (
                     <tr
                       key={i}
-                      className="border-b border-white/[0.04] hover:bg-slate-800/30"
+                      className="border-b border-slate-100 hover:bg-slate-50"
                     >
                       {uploadResult.columns.map((col) => (
-                        <td key={col} className="whitespace-nowrap px-3 py-1.5 text-slate-300">
+                        <td key={col} className="whitespace-nowrap px-3 py-1.5 text-slate-600">
                           {String(row[col] ?? "—")}
                         </td>
                       ))}
@@ -278,13 +278,13 @@ export default function UploadPage() {
             <div className="mt-4 flex gap-3">
               <button
                 onClick={() => router.push("/dashboard")}
-                className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-sky-500 px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
               >
                 Go to Dashboard <ArrowRight size={14} />
               </button>
               <button
                 onClick={() => setUploadResult(null)}
-                className="rounded-lg border border-white/[0.08] px-4 py-2 text-sm text-slate-400 hover:border-white/[0.15]"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-500 hover:border-slate-300"
               >
                 Upload another
               </button>
@@ -295,22 +295,22 @@ export default function UploadPage() {
         {/* Existing datasets */}
         {datasets.length > 0 && (
           <div>
-            <h2 className="mb-3 text-sm font-bold text-white">
+            <h2 className="mb-3 text-sm font-bold text-slate-800">
               Uploaded Datasets
             </h2>
             <div className="space-y-2">
               {datasets.map((ds) => (
                 <div
                   key={ds.dataset_id}
-                  className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-slate-900/60 px-4 py-3"
+                  className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3"
                 >
                   <div className="flex items-center gap-3">
-                    <FileSpreadsheet size={18} className="text-slate-500" />
+                    <FileSpreadsheet size={18} className="text-slate-400" />
                     <div>
-                      <div className="text-sm font-medium text-white">
+                      <div className="text-sm font-medium text-slate-800">
                         {(ds.metadata?.type as string) || "dataset"}{" "}
-                        <span className="text-slate-500">·</span>{" "}
-                        <span className="font-mono text-xs text-slate-400">
+                        <span className="text-slate-400">·</span>{" "}
+                        <span className="font-mono text-xs text-slate-500">
                           {ds.dataset_id.slice(0, 8)}…
                         </span>
                       </div>
@@ -319,7 +319,7 @@ export default function UploadPage() {
                       </div>
                     </div>
                   </div>
-                  <span className="text-xs text-slate-600">
+                  <span className="text-xs text-slate-400">
                     {new Date(ds.created_at).toLocaleTimeString()}
                   </span>
                 </div>
@@ -329,25 +329,25 @@ export default function UploadPage() {
         )}
 
         {/* Help */}
-        <div className="rounded-xl border border-white/[0.06] bg-slate-900/40 p-4">
-          <h3 className="mb-2 text-sm font-bold text-white">
+        <div className="rounded-xl border border-slate-200 bg-white p-4">
+          <h3 className="mb-2 text-sm font-bold text-slate-800">
             Expected data format
           </h3>
-          <div className="grid gap-3 text-xs text-slate-400 sm:grid-cols-2">
+          <div className="grid gap-3 text-xs text-slate-500 sm:grid-cols-2">
             <div>
-              <span className="font-semibold text-slate-300">Patient data</span>
+              <span className="font-semibold text-slate-700">Patient data</span>
               <p>Must include a date column and ED patient count. Example columns: Date, ED, Reason</p>
             </div>
             <div>
-              <span className="font-semibold text-slate-300">Weather data</span>
+              <span className="font-semibold text-slate-700">Weather data</span>
               <p>Date + weather metrics: Average_Temp, Max_wind, Total_precipitation</p>
             </div>
             <div>
-              <span className="font-semibold text-slate-300">Calendar data</span>
+              <span className="font-semibold text-slate-700">Calendar data</span>
               <p>Date + holiday flags: is_holiday, holiday_name, school_term</p>
             </div>
             <div>
-              <span className="font-semibold text-slate-300">Supported formats</span>
+              <span className="font-semibold text-slate-700">Supported formats</span>
               <p>CSV (.csv), Excel (.xlsx, .xls), Parquet (.parquet)</p>
             </div>
           </div>
