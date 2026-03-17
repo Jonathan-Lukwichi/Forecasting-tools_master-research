@@ -26,10 +26,20 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
       <div className="relative flex flex-1 flex-col lg:ml-56">
-        {/* Subtle page background image */}
+        {/* Page background image — visible watermark */}
         <div className="pointer-events-none fixed inset-0 lg:left-56">
-          <Image src={bgImage} alt="" fill className="object-cover opacity-[0.03]" />
+          <Image src={bgImage} alt="" fill className="object-cover opacity-[0.08]" />
+          {/* Soft white overlay to keep text readable */}
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-50/40 via-transparent to-slate-50/60" />
         </div>
+
+        {/* Decorative healthcare pattern — heartbeat lines */}
+        <div className="pointer-events-none fixed bottom-0 left-0 right-0 h-16 opacity-[0.04] lg:left-56">
+          <svg viewBox="0 0 1600 64" fill="none" className="h-full w-full" preserveAspectRatio="none">
+            <path d="M0 32h300l25-24 35 48 25-24 35 48 25-24h300l25-24 35 48 25-24 35 48 25-24h300l25-24 35 48 25-24h300" stroke="#2563eb" strokeWidth="1.5" />
+          </svg>
+        </div>
+
         {/* Top spacing for mobile hamburger */}
         <div className="h-14 lg:hidden" />
         <main className="relative flex-1">{children}</main>
