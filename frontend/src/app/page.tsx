@@ -280,8 +280,10 @@ export default function WelcomePage() {
           ].map((feature) => {
             const Icon = feature.icon;
             return (
-              <div
+              <motion.div
                 key={feature.title}
+                variants={fadeUp}
+                custom={0}
                 className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:border-slate-300 hover:shadow-md sm:p-6"
               >
                 <div
