@@ -289,10 +289,10 @@ export default function WelcomePage() {
       {/* ========== Dynamic Image Gallery — 4 panels, each cycling independently ========== */}
       <section className="relative z-10 overflow-hidden">
         <div className="grid grid-cols-2 sm:grid-cols-4">
-          <DynamicImageCarousel images={GALLERY_SET_1} interval={5000} animation="slideDown" className="h-48 sm:h-56" overlay="bg-blue-900/20 hover:bg-blue-900/10 transition-all duration-500" />
-          <DynamicImageCarousel images={GALLERY_SET_2} interval={6000} animation="slideLeft" className="h-48 sm:h-56" overlay="bg-blue-900/20 hover:bg-blue-900/10 transition-all duration-500" />
-          <DynamicImageCarousel images={GALLERY_SET_3} interval={4500} animation="slideUp" className="h-48 sm:h-56" overlay="bg-blue-900/20 hover:bg-blue-900/10 transition-all duration-500" />
-          <DynamicImageCarousel images={GALLERY_SET_4} interval={5500} animation="slideRight" className="h-48 sm:h-56" overlay="bg-blue-900/20 hover:bg-blue-900/10 transition-all duration-500" />
+          <DynamicImageCarousel images={GALLERY_SET_1} interval={5000} animation="slideDown" className="h-48 sm:h-56" overlay="bg-blue-900/25" />
+          <DynamicImageCarousel images={GALLERY_SET_2} interval={6500} animation="slideLeft" className="h-48 sm:h-56" overlay="bg-blue-900/25" />
+          <DynamicImageCarousel images={GALLERY_SET_3} interval={5500} animation="slideUp" className="h-48 sm:h-56" overlay="bg-blue-900/25" />
+          <DynamicImageCarousel images={GALLERY_SET_4} interval={7000} animation="slideRight" className="h-48 sm:h-56" overlay="bg-blue-900/25" />
         </div>
       </section>
 
