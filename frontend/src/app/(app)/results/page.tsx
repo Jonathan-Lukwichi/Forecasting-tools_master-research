@@ -233,6 +233,7 @@ export default function ResultsPage() {
             </div>
           )
         )}
+        </FadeIn>
       </div>
     </div>
   );
