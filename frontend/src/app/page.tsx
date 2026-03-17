@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import HeartbeatLogo from "@/components/ui/HeartbeatLogo";
+import DynamicImageCarousel from "@/components/ui/DynamicImageCarousel";
 import {
   Activity,
   BarChart3,
@@ -19,6 +20,71 @@ import {
   Zap,
 } from "lucide-react";
 
+// All available images for dynamic cycling
+const HERO_IMAGES = [
+  "/images/hero-bg2.jpg",
+  "/images/hero-bg1.jpg",
+  "/images/hero-bg3.jpg",
+  "/images/dashboard-bg.jpg",
+];
+
+const CAROUSEL_IMAGES = [
+  "/images/carousel-1.jpg",
+  "/images/carousel-2.jpg",
+  "/images/carousel-3.jpg",
+  "/images/carousel-4.jpg",
+];
+
+const TEAM_IMAGES = [
+  "/images/team-bg1.jpg",
+  "/images/team-bg2.jpg",
+  "/images/team-bg4.jpg",
+  "/images/staff-bg.jpg",
+  "/images/team-bg7.jpg",
+];
+
+const GALLERY_SET_1 = [
+  "/images/staff-bg.jpg",
+  "/images/team-bg1.jpg",
+  "/images/staff-bg2.jpg",
+  "/images/team-bg3.jpg",
+];
+
+const GALLERY_SET_2 = [
+  "/images/dashboard-bg.jpg",
+  "/images/carousel-1.jpg",
+  "/images/explore-bg.jpg",
+  "/images/carousel-3.jpg",
+];
+
+const GALLERY_SET_3 = [
+  "/images/supply-bg.jpg",
+  "/images/team-bg5.jpg",
+  "/images/supply-bg2.jpg",
+  "/images/team-bg6.jpg",
+];
+
+const GALLERY_SET_4 = [
+  "/images/team-bg2.jpg",
+  "/images/actions-bg.jpg",
+  "/images/team-bg4.jpg",
+  "/images/prepare-bg.jpg",
+];
+
+const WORKFLOW_IMAGES = [
+  "/images/hero-bg3.jpg",
+  "/images/forecast-bg.jpg",
+  "/images/hero-bg2.jpg",
+  "/images/dashboard-bg2.jpg",
+];
+
+const CTA_IMAGES = [
+  "/images/actions-bg.jpg",
+  "/images/team-bg7.jpg",
+  "/images/carousel-2.jpg",
+  "/images/staff-bg3.jpg",
+];
+
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
   visible: () => ({
@@ -32,13 +98,16 @@ export default function WelcomePage() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-white">
 
-      {/* ========== HERO SECTION — Full panoramic background ========== */}
+      {/* ========== HERO — Dynamic rotating background ========== */}
       <section className="relative overflow-hidden">
-        {/* Panoramic hero image */}
-        <div className="absolute inset-0">
-          <Image src="/images/hero-bg2.jpg" alt="" fill className="object-cover" priority />
-          <div className="absolute inset-0 bg-gradient-to-b from-blue-900/80 via-blue-900/70 to-white" />
-        </div>
+        <DynamicImageCarousel
+          images={HERO_IMAGES}
+          interval={6000}
+          animation="zoom"
+          className="absolute inset-0"
+          overlay="bg-gradient-to-b from-blue-900/80 via-blue-900/70 to-white"
+          priority
+        />
 
         {/* Navigation */}
         <nav className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 sm:py-6">
@@ -46,74 +115,38 @@ export default function WelcomePage() {
             <HeartbeatLogo size={40} />
             <div>
               <div className="text-sm font-bold text-white sm:text-base">HealthForecast</div>
-              <div className="hidden text-[10px] font-medium tracking-wider text-blue-200 sm:block">
-                AI PLATFORM
-              </div>
+              <div className="hidden text-[10px] font-medium tracking-wider text-blue-200 sm:block">AI PLATFORM</div>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
-            <Link href="/login" className="rounded-lg px-3 py-2 text-sm font-medium text-blue-100 transition-colors hover:text-white sm:px-5">
-              Sign in
-            </Link>
-            <Link href="/login" className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-blue-600 shadow-lg transition-all hover:bg-blue-50 sm:px-5">
-              Get Started
-            </Link>
+            <Link href="/login" className="rounded-lg px-3 py-2 text-sm font-medium text-blue-100 transition-colors hover:text-white sm:px-5">Sign in</Link>
+            <Link href="/login" className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-blue-600 shadow-lg transition-all hover:bg-blue-50 sm:px-5">Get Started</Link>
           </div>
         </nav>
 
         {/* Hero content */}
         <div className="relative z-10 mx-auto max-w-7xl px-4 pb-32 pt-12 text-center sm:px-6 sm:pb-40 sm:pt-20">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 backdrop-blur-sm sm:mb-8"
-          >
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 backdrop-blur-sm sm:mb-8">
             <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-400" />
-            <span className="text-xs font-medium text-white">
-              Intelligent Hospital Resource Planning
-            </span>
+            <span className="text-xs font-medium text-white">Intelligent Hospital Resource Planning</span>
           </motion.div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="mx-auto max-w-4xl text-3xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-7xl"
-          >
+          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="mx-auto max-w-4xl text-3xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-7xl">
             Smarter Hospitals,{" "}
-            <span className="bg-gradient-to-r from-cyan-300 via-sky-300 to-blue-300 bg-clip-text text-transparent">
-              Powered by AI
-            </span>
+            <span className="bg-gradient-to-r from-cyan-300 via-sky-300 to-blue-300 bg-clip-text text-transparent">Powered by AI</span>
           </motion.h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-blue-100/90 sm:mt-6 sm:text-lg"
-          >
-            Forecast patient demand, optimize staff schedules, and manage supplies
-            with confidence. HealthForecast AI transforms hospital data into
-            actionable insights that save time, reduce costs, and improve patient care.
+          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-blue-100/90 sm:mt-6 sm:text-lg">
+            Forecast patient demand, optimize staff schedules, and manage supplies with confidence. HealthForecast AI transforms hospital data into actionable insights that save time, reduce costs, and improve patient care.
           </motion.p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-8 flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-4"
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-8 flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-4">
             <Link href="/login" className="group flex w-full items-center justify-center gap-2 rounded-xl bg-white px-8 py-3.5 text-sm font-semibold text-blue-600 shadow-xl transition-all hover:bg-blue-50 sm:w-auto">
-              Launch Dashboard
-              <ChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+              Launch Dashboard <ChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />
             </Link>
-            <a href="#features" className="w-full rounded-xl border border-white/20 bg-white/10 px-8 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20 sm:w-auto">
-              Learn More
-            </a>
+            <a href="#features" className="w-full rounded-xl border border-white/20 bg-white/10 px-8 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20 sm:w-auto">Learn More</a>
           </motion.div>
 
-          {/* Heartbeat decoration */}
           <div className="mx-auto mt-12 max-w-md opacity-20">
             <svg viewBox="0 0 600 50" fill="none" className="w-full">
               <path d="M0 25h120l20-20 30 40 20-20 30 40 20-20h120l20-20 30 40 20-20h120" stroke="white" strokeWidth="2" strokeLinecap="round" />
@@ -122,46 +155,33 @@ export default function WelcomePage() {
         </div>
       </section>
 
-      {/* ========== Dashboard Preview — overlapping hero ========== */}
+      {/* ========== Dynamic Dashboard Carousel — replaces static mock ========== */}
       <section className="relative z-10 mx-auto -mt-20 max-w-5xl px-4 sm:-mt-24 sm:px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-        >
-          <div className="rounded-2xl border border-slate-200 bg-white p-1 shadow-2xl">
-            <div className="rounded-xl bg-slate-50 p-4 sm:p-6">
-              <div className="mb-4 flex items-center justify-between sm:mb-6">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="h-3 w-3 rounded-full bg-red-400" />
-                  <div className="h-3 w-3 rounded-full bg-amber-400" />
-                  <div className="h-3 w-3 rounded-full bg-emerald-400" />
-                </div>
-                <div className="hidden rounded-md border border-slate-200 bg-white px-3 py-1 text-[10px] text-slate-400 sm:block">
-                  healthforecast-ai.vercel.app/dashboard
-                </div>
-                <div />
+        <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }}>
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+            {/* Browser chrome bar */}
+            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-4 py-3">
+              <div className="flex items-center gap-2">
+                <div className="h-3 w-3 rounded-full bg-red-400" />
+                <div className="h-3 w-3 rounded-full bg-amber-400" />
+                <div className="h-3 w-3 rounded-full bg-emerald-400" />
               </div>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
-                {[
-                  { label: "Today's Forecast", value: "142", trend: "+10.9%", color: "text-blue-600" },
-                  { label: "7-Day Total", value: "987", trend: "+10.2%", color: "text-sky-500" },
-                  { label: "Peak Day", value: "168", trend: "+31.3%", color: "text-red-500" },
-                  { label: "Staff Coverage", value: "94.5%", trend: "Optimal", color: "text-emerald-500" },
-                ].map((kpi) => (
-                  <div key={kpi.label} className="rounded-lg border border-slate-200 bg-white p-3 sm:p-4">
-                    <div className="text-[9px] font-semibold uppercase tracking-wider text-slate-400 sm:text-[10px]">{kpi.label}</div>
-                    <div className={`mt-1 font-mono text-lg font-bold sm:text-2xl ${kpi.color}`}>{kpi.value}</div>
-                    <div className="mt-1 text-[10px] text-emerald-500">{kpi.trend}</div>
-                  </div>
-                ))}
+              <div className="hidden rounded-md border border-slate-200 bg-white px-3 py-1 text-[10px] text-slate-400 sm:block">
+                healthforecast-ai.vercel.app/dashboard
               </div>
-              <div className="mt-3 flex h-20 items-end gap-0.5 rounded-lg border border-slate-200 bg-white p-3 sm:mt-4 sm:h-32 sm:gap-1 sm:p-4">
-                {[40, 55, 45, 70, 65, 80, 60, 75, 85, 70, 90, 78, 95, 88, 72, 85, 92, 68, 80, 75].map((h, i) => (
-                  <div key={i} className="flex-1 rounded-sm bg-gradient-to-t from-blue-500 to-sky-300" style={{ height: `${h}%` }} />
-                ))}
+              <div className="flex items-center gap-1">
+                <div className="h-1 w-1 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[9px] font-medium text-emerald-500">LIVE</span>
               </div>
             </div>
+            {/* Dynamic image slideshow */}
+            <DynamicImageCarousel
+              images={CAROUSEL_IMAGES}
+              interval={4000}
+              animation="slideLeft"
+              className="h-56 sm:h-72 md:h-80"
+              overlay="bg-gradient-to-t from-white/20 to-transparent"
+            />
           </div>
         </motion.div>
       </section>
@@ -183,29 +203,24 @@ export default function WelcomePage() {
         </div>
       </section>
 
-      {/* ========== Features Section — with panoramic background image ========== */}
+      {/* ========== Features — subtle rotating background ========== */}
       <section id="features" className="relative z-10 overflow-hidden py-16 sm:py-24">
-        {/* Background image — analytics/dashboard */}
-        <div className="absolute inset-0">
-          <Image src="/images/explore-bg.jpg" alt="" fill className="object-cover opacity-[0.03]" />
-        </div>
+        <DynamicImageCarousel
+          images={["/images/explore-bg.jpg", "/images/carousel-1.jpg", "/images/train-bg.jpg"]}
+          interval={8000}
+          animation="fade"
+          className="absolute inset-0"
+          overlay="bg-white/[0.94]"
+        />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
           <div className="text-center">
             <div className="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-600 sm:mb-4">Platform Capabilities</div>
             <h2 className="text-2xl font-bold text-slate-800 sm:text-3xl lg:text-4xl">Everything You Need to Manage Hospital Demand</h2>
-            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-slate-500 sm:mt-4">
-              From data ingestion to actionable recommendations — a complete end-to-end platform for hospital resource planning.
-            </p>
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-slate-500 sm:mt-4">From data ingestion to actionable recommendations — a complete end-to-end platform for hospital resource planning.</p>
           </div>
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }}
-            className="mt-10 grid gap-4 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3"
-          >
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }} className="mt-10 grid gap-4 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3">
             {[
               { icon: TrendingUp, title: "Demand Forecasting", description: "Predict patient arrivals up to 7 days ahead with high accuracy. Understand trends, seasonality, and patterns in emergency department visits.", color: "from-blue-600 to-sky-400", shadow: "shadow-blue-100" },
               { icon: Users, title: "Staff Optimization", description: "Generate optimal staff schedules that balance coverage, costs, and employee preferences. Minimize overtime while ensuring patient safety.", color: "from-sky-500 to-cyan-400", shadow: "shadow-sky-100" },
@@ -216,7 +231,7 @@ export default function WelcomePage() {
             ].map((feature) => {
               const Icon = feature.icon;
               return (
-                <motion.div key={feature.title} variants={fadeUp} className="group rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm backdrop-blur-sm transition-all hover:border-slate-300 hover:shadow-md sm:p-6">
+                <motion.div key={feature.title} variants={fadeUp} className="group rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm backdrop-blur-sm transition-all hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg sm:p-6">
                   <div className={`mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br ${feature.color} shadow-md ${feature.shadow}`}>
                     <Icon size={20} className="text-white" />
                   </div>
@@ -229,21 +244,21 @@ export default function WelcomePage() {
         </div>
       </section>
 
-      {/* ========== Workflow — Panoramic hospital corridor background ========== */}
+      {/* ========== Workflow — Dynamic panoramic background ========== */}
       <section className="relative z-10 overflow-hidden py-16 sm:py-24">
-        {/* Full-width panoramic background */}
-        <div className="absolute inset-0">
-          <Image src="/images/hero-bg3.jpg" alt="" fill className="object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b from-blue-900/85 via-blue-800/80 to-blue-900/90" />
-        </div>
+        <DynamicImageCarousel
+          images={WORKFLOW_IMAGES}
+          interval={7000}
+          animation="slideRight"
+          className="absolute inset-0"
+          overlay="bg-gradient-to-b from-blue-900/88 via-blue-800/82 to-blue-900/90"
+        />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
           <div className="text-center">
             <div className="mb-3 text-xs font-semibold uppercase tracking-widest text-cyan-300 sm:mb-4">How It Works</div>
             <h2 className="text-2xl font-bold text-white sm:text-3xl lg:text-4xl">From Raw Data to Actionable Plans</h2>
-            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-blue-100/80 sm:mt-4">
-              A streamlined pipeline that transforms your hospital data into optimized schedules and forecasts in minutes.
-            </p>
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-blue-100/80 sm:mt-4">A streamlined pipeline that transforms your hospital data into optimized schedules and forecasts in minutes.</p>
           </div>
 
           <div className="mt-10 grid grid-cols-2 gap-4 sm:mt-16 sm:grid-cols-3 lg:grid-cols-5 lg:gap-0">
@@ -257,9 +272,7 @@ export default function WelcomePage() {
               const Icon = item.icon;
               return (
                 <div key={item.step} className="relative flex flex-col items-center px-2 py-4 text-center sm:px-4 sm:py-6">
-                  {i < 4 && (
-                    <div className="absolute right-0 top-14 hidden h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent lg:block" />
-                  )}
+                  {i < 4 && <div className="absolute right-0 top-14 hidden h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent lg:block" />}
                   <div className="mb-2 text-[10px] font-bold tracking-widest text-cyan-300/80 sm:mb-3">STEP {item.step}</div>
                   <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 backdrop-blur-sm sm:mb-4 sm:h-12 sm:w-12">
                     <Icon size={20} className="text-white" />
@@ -273,33 +286,32 @@ export default function WelcomePage() {
         </div>
       </section>
 
-      {/* ========== Image Gallery Strip — panoramic healthcare images ========== */}
+      {/* ========== Dynamic Image Gallery — 4 panels, each cycling independently ========== */}
       <section className="relative z-10 overflow-hidden">
         <div className="grid grid-cols-2 sm:grid-cols-4">
-          {["/images/staff-bg.jpg", "/images/dashboard-bg.jpg", "/images/supply-bg.jpg", "/images/team-bg2.jpg"].map((src, i) => (
-            <div key={i} className="relative h-48 sm:h-56">
-              <Image src={src} alt="" fill className="object-cover" />
-              <div className="absolute inset-0 bg-blue-900/30" />
-            </div>
-          ))}
+          <DynamicImageCarousel images={GALLERY_SET_1} interval={5000} animation="slideDown" className="h-48 sm:h-56" overlay="bg-blue-900/20 hover:bg-blue-900/10 transition-all duration-500" />
+          <DynamicImageCarousel images={GALLERY_SET_2} interval={6000} animation="slideLeft" className="h-48 sm:h-56" overlay="bg-blue-900/20 hover:bg-blue-900/10 transition-all duration-500" />
+          <DynamicImageCarousel images={GALLERY_SET_3} interval={4500} animation="slideUp" className="h-48 sm:h-56" overlay="bg-blue-900/20 hover:bg-blue-900/10 transition-all duration-500" />
+          <DynamicImageCarousel images={GALLERY_SET_4} interval={5500} animation="slideRight" className="h-48 sm:h-56" overlay="bg-blue-900/20 hover:bg-blue-900/10 transition-all duration-500" />
         </div>
       </section>
 
-      {/* ========== Benefits Section — with team photo background ========== */}
+      {/* ========== Benefits — with dynamic team photos ========== */}
       <section className="relative z-10 overflow-hidden py-16 sm:py-24">
-        {/* Subtle background */}
-        <div className="absolute inset-0">
-          <Image src="/images/prepare-bg.jpg" alt="" fill className="object-cover opacity-[0.04]" />
-        </div>
+        <DynamicImageCarousel
+          images={["/images/prepare-bg.jpg", "/images/team-bg1.jpg", "/images/carousel-4.jpg"]}
+          interval={9000}
+          animation="fade"
+          className="absolute inset-0"
+          overlay="bg-white/[0.95]"
+        />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
           <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-12">
             <div>
               <div className="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-600 sm:mb-4">Why HealthForecast AI</div>
               <h2 className="text-2xl font-bold text-slate-800 sm:text-3xl lg:text-4xl">Built for Hospital Decision Makers</h2>
-              <p className="mt-3 text-sm leading-relaxed text-slate-500 sm:mt-4">
-                Whether you are a hospital administrator, nursing director, or operations manager — HealthForecast AI gives you the insights you need to make better decisions, faster.
-              </p>
+              <p className="mt-3 text-sm leading-relaxed text-slate-500 sm:mt-4">Whether you are a hospital administrator, nursing director, or operations manager — HealthForecast AI gives you the insights you need to make better decisions, faster.</p>
               <div className="mt-6 space-y-4 sm:mt-8">
                 {[
                   { icon: Heart, title: "Improve Patient Care", desc: "Ensure the right staff and supplies are available when patients need them most.", color: "text-red-500 bg-red-50 border-red-100" },
@@ -309,9 +321,7 @@ export default function WelcomePage() {
                   const Icon = benefit.icon;
                   return (
                     <div key={benefit.title} className="flex gap-4">
-                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border ${benefit.color}`}>
-                        <Icon size={16} />
-                      </div>
+                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border ${benefit.color}`}><Icon size={16} /></div>
                       <div>
                         <h3 className="text-sm font-semibold text-slate-800">{benefit.title}</h3>
                         <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{benefit.desc}</p>
@@ -322,19 +332,19 @@ export default function WelcomePage() {
               </div>
             </div>
 
-            {/* Visual card with multiple images */}
+            {/* Dynamic visual card */}
             <div className="space-y-4">
-              {/* Two-image panoramic strip */}
+              {/* Two dynamic image panels cycling independently */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="relative h-36 overflow-hidden rounded-xl border border-slate-200 shadow-sm sm:h-44">
-                  <Image src="/images/team-bg1.jpg" alt="Healthcare team" fill className="object-cover" />
+                <div className="overflow-hidden rounded-xl border border-slate-200 shadow-sm">
+                  <DynamicImageCarousel images={TEAM_IMAGES} interval={4000} animation="slideUp" className="h-36 sm:h-44" />
                 </div>
-                <div className="relative h-36 overflow-hidden rounded-xl border border-slate-200 shadow-sm sm:h-44">
-                  <Image src="/images/dashboard-bg.jpg" alt="Hospital operations" fill className="object-cover" />
+                <div className="overflow-hidden rounded-xl border border-slate-200 shadow-sm">
+                  <DynamicImageCarousel images={CAROUSEL_IMAGES} interval={5000} animation="slideDown" className="h-36 sm:h-44" />
                 </div>
               </div>
               {/* Progress metrics */}
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <div className="rounded-2xl border border-slate-200 bg-white/95 p-5 shadow-sm backdrop-blur-sm sm:p-6">
                 <div className="space-y-3">
                   {[
                     { label: "Forecast Accuracy", value: 96, color: "bg-blue-500" },
@@ -359,24 +369,21 @@ export default function WelcomePage() {
         </div>
       </section>
 
-      {/* ========== CTA — panoramic background ========== */}
+      {/* ========== CTA — Dynamic panoramic background ========== */}
       <section className="relative z-10 overflow-hidden py-16 sm:py-24">
-        <div className="absolute inset-0">
-          <Image src="/images/actions-bg.jpg" alt="" fill className="object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 via-blue-800/85 to-sky-900/90" />
-        </div>
+        <DynamicImageCarousel
+          images={CTA_IMAGES}
+          interval={5000}
+          animation="slideLeft"
+          className="absolute inset-0"
+          overlay="bg-gradient-to-r from-blue-900/92 via-blue-800/88 to-sky-900/92"
+        />
         <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
-          <h2 className="text-2xl font-bold text-white sm:text-3xl lg:text-4xl">
-            Ready to Transform Your Hospital Operations?
-          </h2>
-          <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-blue-100/80 sm:mt-4">
-            Start forecasting patient demand, optimizing schedules, and making data-driven decisions today.
-          </p>
+          <h2 className="text-2xl font-bold text-white sm:text-3xl lg:text-4xl">Ready to Transform Your Hospital Operations?</h2>
+          <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-blue-100/80 sm:mt-4">Start forecasting patient demand, optimizing schedules, and making data-driven decisions today.</p>
           <Link href="/login" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-8 py-3.5 text-sm font-semibold text-blue-600 shadow-xl transition-all hover:bg-blue-50 sm:mt-8 sm:px-10 sm:py-4">
-            Get Started Now
-            <ChevronRight size={16} />
+            Get Started Now <ChevronRight size={16} />
           </Link>
-          {/* Heartbeat decoration */}
           <div className="mx-auto mt-8 max-w-sm opacity-20">
             <svg viewBox="0 0 400 40" fill="none" className="w-full">
               <path d="M0 20h80l15-16 20 32 15-16 20 32 15-16h80l15-16 20 32 15-16h80" stroke="white" strokeWidth="2" strokeLinecap="round" />
