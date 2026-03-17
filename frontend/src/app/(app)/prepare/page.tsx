@@ -197,29 +197,15 @@ export default function PreparePage() {
     <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-extrabold text-slate-900">Prepare Data</h1>
-            <p className="mt-1 text-sm text-slate-500">
-              Fuse datasets and engineer features for forecasting
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => router.push("/upload")}
-              className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 transition-colors hover:border-slate-300"
-            >
-              Upload
-            </button>
-            <button
-              onClick={() => router.push("/explore")}
-              className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 transition-colors hover:border-slate-300"
-            >
-              Explore <ArrowRight size={14} />
-            </button>
-          </div>
-        </div>
+        <PageHeader
+          title="Prepare Data"
+          description="Fuse and validate your datasets for accurate forecasting"
+          icon={Layers}
+          badge="Step 2"
+          accentColor="sky"
+        />
 
+        <FadeIn delay={0.15}>
         {/* Step 1: Select datasets */}
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
           <div className="mb-4 flex items-center gap-2">
