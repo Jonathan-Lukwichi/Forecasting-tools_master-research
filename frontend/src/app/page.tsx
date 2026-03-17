@@ -295,10 +295,10 @@ export default function WelcomePage() {
                 <p className="mt-2 text-sm leading-relaxed text-slate-500">
                   {feature.description}
                 </p>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </section>
 
       {/* Workflow Section */}
