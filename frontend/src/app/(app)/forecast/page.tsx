@@ -14,6 +14,8 @@ import { useRouter } from "next/navigation";
 import { TrendingUp, AlertCircle, ArrowRight, Calendar } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, ComposedChart } from "recharts";
 import { getMe, listDatasets, getModelComparison, generateForecast, type DatasetInfo, type ForecastResponse } from "@/lib/api";
+import PageHeader from "@/components/ui/PageHeader";
+import FadeIn from "@/components/ui/FadeIn";
 
 export default function ForecastPage() {
   const router = useRouter();
