@@ -46,6 +46,8 @@ import {
   type JobStatus,
   type TrainResult,
 } from "@/lib/api";
+import PageHeader from "@/components/ui/PageHeader";
+import FadeIn from "@/components/ui/FadeIn";
 
 const ML_MODELS = [
   { value: "xgboost", label: "XGBoost", icon: "🌲", desc: "Gradient boosting for tabular data" },
