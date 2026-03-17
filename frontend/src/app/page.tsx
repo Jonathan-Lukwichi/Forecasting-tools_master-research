@@ -195,12 +195,20 @@ export default function WelcomePage() {
         </div>
       </section>
 
-      {/* ========== Image Gallery — static, 4 photos side by side ========== */}
+      {/* ========== Image Gallery — 4 photos with captions ========== */}
       <section className="grid grid-cols-2 sm:grid-cols-4">
-        {["/images/staff-bg.jpg", "/images/carousel-2.jpg", "/images/supply-bg.jpg", "/images/team-bg2.jpg"].map((src) => (
-          <div key={src} className="relative h-48 sm:h-56">
-            <Image src={src} alt="" fill className="object-cover" />
-            <div className="absolute inset-0 bg-blue-900/20" />
+        {[
+          { src: "/images/staff-bg.jpg", label: "Our Team" },
+          { src: "/images/carousel-2.jpg", label: "Analytics" },
+          { src: "/images/supply-bg.jpg", label: "Supply Chain" },
+          { src: "/images/team-bg2.jpg", label: "Collaboration" },
+        ].map((img) => (
+          <div key={img.src} className="group relative h-48 overflow-hidden sm:h-56">
+            <Image src={img.src} alt={img.label} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-blue-900/35" />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-blue-900/60 to-transparent p-4">
+              <span className="text-xs font-semibold uppercase tracking-wider text-white/90">{img.label}</span>
+            </div>
           </div>
         ))}
       </section>
