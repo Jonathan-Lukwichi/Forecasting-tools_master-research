@@ -170,7 +170,7 @@ export default function TrainPage() {
     <button
       onClick={() => setTab(id)}
       className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold transition-all ${
-        tab === id ? "bg-cyan-400/10 text-cyan-400 border border-cyan-400/30" : "text-slate-500 hover:text-slate-300"
+        tab === id ? "bg-blue-50 text-blue-600 border border-blue-200" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
       }`}
     >
       {icon} {label}
@@ -178,17 +178,17 @@ export default function TrainPage() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-950 px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-extrabold text-white">Train Models</h1>
-            <p className="mt-1 text-sm text-slate-400">Train ML and statistical forecasting models</p>
+            <h1 className="text-2xl font-extrabold text-slate-900">Train Models</h1>
+            <p className="mt-1 text-sm text-slate-500">Train ML and statistical forecasting models</p>
           </div>
           <button
             onClick={() => router.push("/results")}
-            className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-slate-900/80 px-4 py-2 text-sm text-slate-300 hover:border-white/[0.15]"
+            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 hover:border-slate-300 hover:bg-slate-50"
           >
             Results <ArrowRight size={14} />
           </button>
@@ -200,7 +200,7 @@ export default function TrainPage() {
           <select
             value={selectedDataset}
             onChange={(e) => setSelectedDataset(e.target.value)}
-            className="rounded-lg border border-white/[0.08] bg-slate-900/80 px-3 py-2 text-sm text-white focus:border-cyan-400/40 focus:outline-none"
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-blue-400 focus:outline-none"
           >
             <option value="">— Select dataset —</option>
             {datasets.map((d) => (
@@ -215,26 +215,26 @@ export default function TrainPage() {
         {activeJobs.size > 0 && (
           <div className="space-y-2">
             {[...activeJobs.entries()].map(([jobId, job]) => (
-              <div key={jobId} className="rounded-xl border border-white/[0.06] bg-slate-900/60 p-4">
+              <div key={jobId} className="rounded-xl border border-slate-200 bg-white p-4">
                 <div className="mb-2 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     {job.status === "running" ? (
-                      <Loader2 size={16} className="animate-spin text-cyan-400" />
+                      <Loader2 size={16} className="animate-spin text-blue-600" />
                     ) : job.status === "completed" ? (
-                      <CheckCircle2 size={16} className="text-emerald-400" />
+                      <CheckCircle2 size={16} className="text-emerald-500" />
                     ) : job.status === "failed" ? (
-                      <XCircle size={16} className="text-red-400" />
+                      <XCircle size={16} className="text-red-500" />
                     ) : (
-                      <Clock size={16} className="text-slate-500" />
+                      <Clock size={16} className="text-slate-400" />
                     )}
-                    <span className="text-sm font-medium text-white">{job.message || job.status}</span>
+                    <span className="text-sm font-medium text-slate-800">{job.message || job.status}</span>
                   </div>
                   <span className="font-mono text-xs text-slate-500">{jobId.slice(0, 8)}</span>
                 </div>
                 {/* Progress bar */}
-                <div className="h-2 overflow-hidden rounded-full bg-slate-800">
+                <div className="h-2 overflow-hidden rounded-full bg-slate-100">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-500"
+                    className="h-full rounded-full bg-gradient-to-r from-blue-600 to-sky-500 transition-all duration-500"
                     style={{ width: `${(job.progress || 0) * 100}%` }}
                   />
                 </div>
@@ -245,7 +245,7 @@ export default function TrainPage() {
         )}
 
         {error && (
-          <div className="flex items-center gap-2 rounded-lg border border-red-400/20 bg-red-400/5 px-4 py-3 text-sm text-red-400">
+          <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-500">
             <AlertCircle size={16} /> {error}
           </div>
         )}
@@ -259,31 +259,31 @@ export default function TrainPage() {
 
         {/* ML Tab */}
         {tab === "ml" && (
-          <div className="rounded-2xl border border-white/[0.06] bg-slate-900/40 p-5">
-            <h2 className="mb-4 text-sm font-bold text-white">Select ML Model</h2>
+          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+            <h2 className="mb-4 text-sm font-bold text-slate-800">Select ML Model</h2>
             <div className="mb-4 grid grid-cols-3 gap-3">
               {ML_MODELS.map((m) => (
                 <button
                   key={m.value}
                   onClick={() => setMlModel(m.value)}
                   className={`rounded-xl border p-3 text-left transition-all ${
-                    mlModel === m.value ? "border-cyan-400/40 bg-cyan-400/5" : "border-white/[0.06] bg-slate-900/60 hover:border-white/[0.12]"
+                    mlModel === m.value ? "border-blue-200 bg-blue-50" : "border-slate-200 bg-white hover:border-slate-300"
                   }`}
                 >
                   <span className="text-lg">{m.icon}</span>
-                  <div className="mt-1 text-sm font-semibold text-white">{m.label}</div>
+                  <div className="mt-1 text-sm font-semibold text-slate-800">{m.label}</div>
                   <div className="text-[11px] text-slate-500">{m.desc}</div>
                 </button>
               ))}
             </div>
 
             <div className="mb-4 flex items-center gap-4">
-              <label className="flex items-center gap-2 text-sm text-slate-300">
+              <label className="flex items-center gap-2 text-sm text-slate-600">
                 <input
                   type="checkbox"
                   checked={autoTune}
                   onChange={(e) => setAutoTune(e.target.checked)}
-                  className="rounded border-white/20 bg-slate-800"
+                  className="rounded border-slate-300 bg-white"
                 />
                 Auto-tune (Optuna)
               </label>
@@ -296,7 +296,7 @@ export default function TrainPage() {
                     max={200}
                     value={nTrials}
                     onChange={(e) => setNTrials(Number(e.target.value))}
-                    className="w-20 rounded-lg border border-white/[0.08] bg-slate-900/80 px-2 py-1 text-sm text-white"
+                    className="w-20 rounded-lg border border-slate-200 bg-white px-2 py-1 text-sm text-slate-800 focus:border-blue-400 focus:outline-none"
                   />
                 </div>
               )}
@@ -305,7 +305,7 @@ export default function TrainPage() {
             <button
               onClick={handleTrainML}
               disabled={!selectedDataset}
-              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-sky-500 px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Play size={16} /> Train {ML_MODELS.find((m) => m.value === mlModel)?.label}
             </button>
@@ -314,30 +314,30 @@ export default function TrainPage() {
 
         {/* Baseline Tab */}
         {tab === "baseline" && (
-          <div className="rounded-2xl border border-white/[0.06] bg-slate-900/40 p-5">
-            <h2 className="mb-4 text-sm font-bold text-white">Select Baseline Model</h2>
+          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+            <h2 className="mb-4 text-sm font-bold text-slate-800">Select Baseline Model</h2>
             <div className="mb-4 grid grid-cols-2 gap-3">
               {BASELINE_MODELS.map((m) => (
                 <button
                   key={m.value}
                   onClick={() => setBaselineModel(m.value)}
                   className={`rounded-xl border p-3 text-left transition-all ${
-                    baselineModel === m.value ? "border-cyan-400/40 bg-cyan-400/5" : "border-white/[0.06] bg-slate-900/60 hover:border-white/[0.12]"
+                    baselineModel === m.value ? "border-blue-200 bg-blue-50" : "border-slate-200 bg-white hover:border-slate-300"
                   }`}
                 >
                   <span className="text-lg">{m.icon}</span>
-                  <div className="mt-1 text-sm font-semibold text-white">{m.label}</div>
+                  <div className="mt-1 text-sm font-semibold text-slate-800">{m.label}</div>
                   <div className="text-[11px] text-slate-500">{m.desc}</div>
                 </button>
               ))}
             </div>
 
-            <label className="mb-4 flex items-center gap-2 text-sm text-slate-300">
+            <label className="mb-4 flex items-center gap-2 text-sm text-slate-600">
               <input
                 type="checkbox"
                 checked={autoOrder}
                 onChange={(e) => setAutoOrder(e.target.checked)}
-                className="rounded border-white/20 bg-slate-800"
+                className="rounded border-slate-300 bg-white"
               />
               Auto-detect order (recommended)
             </label>
@@ -345,7 +345,7 @@ export default function TrainPage() {
             <button
               onClick={handleTrainBaseline}
               disabled={!selectedDataset}
-              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-sky-500 px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Play size={16} /> Train {BASELINE_MODELS.find((m) => m.value === baselineModel)?.label}
             </button>
@@ -356,22 +356,22 @@ export default function TrainPage() {
         {tab === "results" && (
           <div className="space-y-4">
             {completedResults.length === 0 ? (
-              <div className="rounded-2xl border border-white/[0.06] bg-slate-900/40 p-12 text-center">
-                <BarChart3 size={40} className="mx-auto mb-3 text-slate-600" />
+              <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center">
+                <BarChart3 size={40} className="mx-auto mb-3 text-slate-300" />
                 <p className="text-sm text-slate-500">No results yet. Train a model to see results here.</p>
               </div>
             ) : (
               <>
                 {/* Comparison table */}
-                <div className="overflow-x-auto rounded-2xl border border-white/[0.06]">
+                <div className="overflow-x-auto rounded-2xl border border-slate-200">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-white/[0.06] bg-slate-800/50">
-                        <th className="px-4 py-3 text-left font-semibold text-slate-400">Model</th>
-                        <th className="px-4 py-3 text-right font-semibold text-slate-400">RMSE</th>
-                        <th className="px-4 py-3 text-right font-semibold text-slate-400">MAE</th>
-                        <th className="px-4 py-3 text-right font-semibold text-slate-400">MAPE %</th>
-                        <th className="px-4 py-3 text-right font-semibold text-slate-400">Time (s)</th>
+                      <tr className="border-b border-slate-200 bg-slate-50">
+                        <th className="px-4 py-3 text-left font-semibold text-slate-600">Model</th>
+                        <th className="px-4 py-3 text-right font-semibold text-slate-600">RMSE</th>
+                        <th className="px-4 py-3 text-right font-semibold text-slate-600">MAE</th>
+                        <th className="px-4 py-3 text-right font-semibold text-slate-600">MAPE %</th>
+                        <th className="px-4 py-3 text-right font-semibold text-slate-600">Time (s)</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -380,16 +380,16 @@ export default function TrainPage() {
                         .map((r, i) => (
                           <tr
                             key={r.model_id || i}
-                            className={`border-b border-white/[0.04] hover:bg-slate-800/30 ${i === 0 ? "bg-emerald-400/5" : ""}`}
+                            className={`border-b border-slate-100 hover:bg-slate-50 ${i === 0 ? "bg-emerald-50" : ""}`}
                           >
                             <td className="px-4 py-2.5">
-                              <div className="font-medium text-white">{r.model_name || r.model_type}</div>
+                              <div className="font-medium text-slate-800">{r.model_name || r.model_type}</div>
                               <div className="font-mono text-xs text-slate-500">{r.model_id?.slice(0, 8)}</div>
                             </td>
-                            <td className="px-4 py-2.5 text-right font-mono text-white">{r.metrics?.rmse?.toFixed(2) ?? "—"}</td>
-                            <td className="px-4 py-2.5 text-right font-mono text-white">{r.metrics?.mae?.toFixed(2) ?? "—"}</td>
-                            <td className="px-4 py-2.5 text-right font-mono text-white">{r.metrics?.mape?.toFixed(2) ?? "—"}</td>
-                            <td className="px-4 py-2.5 text-right font-mono text-slate-400">{r.training_time?.toFixed(1) ?? "—"}</td>
+                            <td className="px-4 py-2.5 text-right font-mono text-slate-800">{r.metrics?.rmse?.toFixed(2) ?? "—"}</td>
+                            <td className="px-4 py-2.5 text-right font-mono text-slate-800">{r.metrics?.mae?.toFixed(2) ?? "—"}</td>
+                            <td className="px-4 py-2.5 text-right font-mono text-slate-800">{r.metrics?.mape?.toFixed(2) ?? "—"}</td>
+                            <td className="px-4 py-2.5 text-right font-mono text-slate-500">{r.training_time?.toFixed(1) ?? "—"}</td>
                           </tr>
                         ))}
                     </tbody>
@@ -398,13 +398,13 @@ export default function TrainPage() {
 
                 {/* Best model highlight */}
                 {completedResults.length > 0 && (
-                  <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/5 p-4">
-                    <div className="flex items-center gap-2 text-sm text-emerald-400">
+                  <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                    <div className="flex items-center gap-2 text-sm text-emerald-600">
                       <CheckCircle2 size={16} />
                       <span className="font-semibold">
                         Best model: {completedResults.sort((a, b) => (a.metrics?.rmse || 999) - (b.metrics?.rmse || 999))[0]?.model_name}
                       </span>
-                      <span className="text-emerald-300/70">
+                      <span className="text-emerald-500">
                         (RMSE: {completedResults.sort((a, b) => (a.metrics?.rmse || 999) - (b.metrics?.rmse || 999))[0]?.metrics?.rmse?.toFixed(2)})
                       </span>
                     </div>
