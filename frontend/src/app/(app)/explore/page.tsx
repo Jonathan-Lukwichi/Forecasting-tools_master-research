@@ -131,21 +131,15 @@ export default function ExplorePage() {
     <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-extrabold text-slate-900">Explore Data</h1>
-            <p className="mt-1 text-sm text-slate-500">Exploratory data analysis and visualizations</p>
-          </div>
-          <div className="flex gap-2">
-            <button onClick={() => router.push("/prepare")} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 hover:border-slate-300">
-              Prepare
-            </button>
-            <button onClick={() => router.push("/dashboard")} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 hover:border-slate-300">
-              Dashboard <ArrowRight size={14} />
-            </button>
-          </div>
-        </div>
+        <PageHeader
+          title="Explore Data"
+          description="Discover patterns, correlations, and trends in your data"
+          icon={BarChart3}
+          badge="Step 3"
+          accentColor="indigo"
+        />
 
+        <FadeIn delay={0.15}>
         {/* Dataset selector */}
         <div className="flex items-center gap-3">
           <Database size={16} className="text-slate-400" />
