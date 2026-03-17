@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
+import HeartbeatLogo from "@/components/ui/HeartbeatLogo";
 import {
   Activity,
   BarChart3,
@@ -39,9 +41,7 @@ export default function WelcomePage() {
       {/* Navigation */}
       <nav className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 sm:py-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-sky-400 text-base font-black text-white shadow-md shadow-blue-200 sm:h-10 sm:w-10 sm:text-lg">
-            H
-          </div>
+          <HeartbeatLogo size={40} />
           <div>
             <div className="text-sm font-bold text-slate-800 sm:text-base">HealthForecast</div>
             <div className="hidden text-[10px] font-medium tracking-wider text-slate-400 sm:block">
@@ -67,6 +67,11 @@ export default function WelcomePage() {
 
       {/* Hero Section */}
       <section className="relative z-10 mx-auto max-w-7xl px-4 pb-12 pt-10 text-center sm:px-6 sm:pb-20 sm:pt-16">
+        {/* Hero background image */}
+        <div className="absolute inset-0 z-0">
+          <Image src="/images/hero-bg3.jpg" alt="" fill className="object-cover opacity-[0.04]" />
+        </div>
+
         {/* Badge */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -266,8 +271,8 @@ export default function WelcomePage() {
               title: "Supply Management",
               description:
                 "Optimize inventory levels, reduce waste, and prevent stockouts of critical medical supplies. Smart reorder alerts keep you prepared.",
-              color: "from-red-500 to-rose-400",
-              shadow: "shadow-red-100",
+              color: "from-emerald-500 to-teal-400",
+              shadow: "shadow-emerald-100",
             },
             {
               icon: Activity,
@@ -429,6 +434,16 @@ export default function WelcomePage() {
 
           {/* Visual card */}
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            {/* Team photo */}
+            <div className="mb-4 overflow-hidden rounded-2xl border border-slate-200 shadow-sm">
+              <Image
+                src="/images/team-bg1.jpg"
+                alt="Healthcare professionals reviewing data"
+                width={600}
+                height={340}
+                className="h-48 w-full object-cover sm:h-56"
+              />
+            </div>
             <div className="space-y-3">
               {[
                 { label: "Forecast Accuracy", value: 96, color: "bg-blue-500" },
@@ -480,9 +495,7 @@ export default function WelcomePage() {
       <footer className="relative z-10 border-t border-slate-200 bg-slate-50 py-6 sm:py-8">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 sm:flex-row sm:px-6">
           <div className="flex items-center gap-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-blue-600 to-sky-400 text-[10px] font-black text-white">
-              H
-            </div>
+            <HeartbeatLogo size={24} />
             <span className="text-xs text-slate-500">
               HealthForecast AI — Master Thesis Prototype
             </span>
