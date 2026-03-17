@@ -14,6 +14,8 @@ import { useRouter } from "next/navigation";
 import { Users, AlertCircle, ArrowRight, CheckCircle2, DollarSign, Clock } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { getMe, listDatasets, optimizeStaff, type DatasetInfo, type StaffOptimizeResponse } from "@/lib/api";
+import PageHeader from "@/components/ui/PageHeader";
+import FadeIn from "@/components/ui/FadeIn";
 
 export default function StaffPage() {
   const router = useRouter();
