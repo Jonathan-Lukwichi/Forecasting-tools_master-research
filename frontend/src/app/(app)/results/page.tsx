@@ -97,21 +97,23 @@ export default function ResultsPage() {
     <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-extrabold text-slate-900">Model Results</h1>
-            <p className="mt-1 text-sm text-slate-500">Compare trained models and select the best performer</p>
-          </div>
-          <div className="flex gap-2">
-            <button onClick={() => router.push("/train")} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 hover:border-slate-300 hover:bg-slate-50">
-              Train
-            </button>
-            <button onClick={() => router.push("/forecast")} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 hover:border-slate-300 hover:bg-slate-50">
-              Forecast <ArrowRight size={14} />
-            </button>
-          </div>
+        <PageHeader
+          title="Model Results"
+          description="Compare model performance and select the best forecasting approach"
+          icon={Trophy}
+          badge="Step 5"
+          accentColor="amber"
+        />
+        <div className="flex justify-end gap-2 -mt-2">
+          <button onClick={() => router.push("/train")} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 hover:border-slate-300 hover:bg-slate-50">
+            Train
+          </button>
+          <button onClick={() => router.push("/forecast")} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 hover:border-slate-300 hover:bg-slate-50">
+            Forecast <ArrowRight size={14} />
+          </button>
         </div>
 
+        <FadeIn delay={0.15}>
         {/* Controls */}
         <div className="flex items-center gap-4">
           <select
