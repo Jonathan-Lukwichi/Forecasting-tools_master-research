@@ -60,10 +60,13 @@ app.include_router(jobs.ws_router)
 # ---------------------------------------------------------------------------
 @app.get("/health", tags=["System"])
 def health_check():
+    from api.services.supabase_service import is_connected as supabase_connected
+
     return {
         "status": "healthy",
         "app": settings.app_name,
         "version": settings.app_version,
+        "supabase_connected": supabase_connected(),
     }
 
 
