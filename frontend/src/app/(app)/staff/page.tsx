@@ -158,6 +158,7 @@ export default function StaffPage() {
             <p className="text-sm text-slate-500">Configure parameters and run the staff scheduling optimizer</p>
           </div>
         )}
+        </FadeIn>
       </div>
     </div>
   );
