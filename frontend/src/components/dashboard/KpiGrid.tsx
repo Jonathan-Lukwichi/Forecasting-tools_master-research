@@ -1,6 +1,5 @@
 /**
- * KPI Grid — 4-card row matching the Figma dashboard layout.
- * Adapts to HealthForecast AI data (patient forecasts, not web analytics).
+ * KPI Grid — 4-card row — healthcare white theme.
  */
 "use client";
 
@@ -14,7 +13,6 @@ interface KpiGridProps {
   historicalAvg: number;
   hasForecast: boolean;
   hasHistorical: boolean;
-  // Sparkline data
   forecastTrend?: number[];
   dailyPattern?: number[];
 }
@@ -30,7 +28,6 @@ export default function KpiGrid({
   forecastTrend = [],
   dailyPattern = [],
 }: KpiGridProps) {
-  // Calculate trends (compare forecast to historical average)
   const avgTrendPct = hasHistorical && historicalAvg > 0
     ? parseFloat((((todayForecast - historicalAvg) / historicalAvg) * 100).toFixed(1))
     : 0;
@@ -40,7 +37,7 @@ export default function KpiGrid({
       {/* Card 1: Today's Forecast */}
       <KpiCard
         label="Day 1 Forecast"
-        value={hasForecast ? todayForecast : "—"}
+        value={hasForecast ? todayForecast : "\u2014"}
         trend={
           hasForecast && avgTrendPct !== 0
             ? { value: Math.abs(avgTrendPct), direction: avgTrendPct > 0 ? "up" : "down" }
@@ -48,14 +45,14 @@ export default function KpiGrid({
         }
         sparkline={forecastTrend.length > 0 ? forecastTrend : undefined}
         sparklineType="bar"
-        color="text-cyan-400"
-        accentHex="#22d3ee"
+        color="text-blue-600"
+        accentHex="#2563eb"
       />
 
       {/* Card 2: 7-Day Total */}
       <KpiCard
         label="7-Day Total"
-        value={hasForecast ? weekTotal : "—"}
+        value={hasForecast ? weekTotal : "\u2014"}
         trend={
           hasForecast && hasHistorical
             ? {
@@ -68,14 +65,14 @@ export default function KpiGrid({
         }
         sparkline={forecastTrend.length > 0 ? forecastTrend : undefined}
         sparklineType="line"
-        color="text-blue-400"
-        accentHex="#3b82f6"
+        color="text-sky-500"
+        accentHex="#0ea5e9"
       />
 
       {/* Card 3: Peak Day */}
       <KpiCard
         label="Peak Day"
-        value={hasForecast ? peakDay : "—"}
+        value={hasForecast ? peakDay : "\u2014"}
         trend={
           hasForecast && hasHistorical
             ? {
@@ -88,18 +85,18 @@ export default function KpiGrid({
         }
         sparkline={dailyPattern.length > 0 ? dailyPattern : undefined}
         sparklineType="area"
-        color="text-amber-400"
+        color="text-amber-500"
         accentHex="#f59e0b"
       />
 
       {/* Card 4: Historical Average */}
       <KpiCard
         label="Historical Avg"
-        value={hasHistorical ? Math.round(historicalAvg) : "—"}
+        value={hasHistorical ? Math.round(historicalAvg) : "\u2014"}
         sparkline={dailyPattern.length > 0 ? dailyPattern : undefined}
         sparklineType="bar"
-        color="text-violet-400"
-        accentHex="#a78bfa"
+        color="text-violet-500"
+        accentHex="#8b5cf6"
       />
     </div>
   );
