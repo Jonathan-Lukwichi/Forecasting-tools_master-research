@@ -1,9 +1,18 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import HeartbeatLogo from "@/components/ui/HeartbeatLogo";
+
+const HERO_SLIDES = [
+  "/images/hero-bg2.jpg",
+  "/images/hero-bg1.jpg",
+  "/images/hero-bg3.jpg",
+  "/images/carousel-1.jpg",
+  "/images/dashboard-bg.jpg",
+];
 import {
   Activity,
   BarChart3,
