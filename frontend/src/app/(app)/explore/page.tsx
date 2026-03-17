@@ -338,6 +338,7 @@ export default function ExplorePage() {
             <p className="mt-1 text-xs text-slate-400">Upload and fuse data first if you haven&apos;t already</p>
           </div>
         )}
+        </FadeIn>
       </div>
     </div>
   );
