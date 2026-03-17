@@ -185,7 +185,7 @@ export default function WelcomePage() {
               const Icon = item.icon;
               return (
                 <div key={item.step} className="relative flex flex-col items-center py-4 text-center">
-                  {i < 4 && <div className="absolute right-0 top-12 hidden h-px w-full bg-gradient-to-r from-transparent via-slate-600 to-transparent lg:block" />}
+                  {i < 4 && <div className="absolute right-0 top-12 hidden h-[2px] w-full bg-gradient-to-r from-cyan-400/10 via-cyan-400/40 to-cyan-400/10 lg:block" />}
                   <div className="mb-2 text-[10px] font-bold tracking-widest text-cyan-400">STEP {item.step}</div>
                   <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2 border-cyan-400/30 bg-cyan-400/10">
                     <Icon size={22} className="text-cyan-400" />
