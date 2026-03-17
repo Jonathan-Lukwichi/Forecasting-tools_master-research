@@ -184,6 +184,11 @@ export default function UploadPage() {
               <p className="mt-1 text-xs text-slate-500">
                 or click to browse — CSV, Excel, Parquet
               </p>
+              <div className="mt-3 flex items-center justify-center gap-2">
+                <span className="rounded-md bg-blue-50 border border-blue-200 px-2.5 py-1 text-[10px] font-bold text-blue-600">CSV</span>
+                <span className="rounded-md bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-[10px] font-bold text-emerald-600">EXCEL</span>
+                <span className="rounded-md bg-violet-50 border border-violet-200 px-2.5 py-1 text-[10px] font-bold text-violet-600">PARQUET</span>
+              </div>
             </>
           )}
         </div>
