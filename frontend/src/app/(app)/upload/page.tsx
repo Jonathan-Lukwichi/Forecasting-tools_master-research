@@ -120,6 +120,7 @@ export default function UploadPage() {
           icon={Upload}
           badge="Step 1"
           accentColor="blue"
+          images={["/images/login-bg1.jpg"]}
         />
 
         <FadeIn delay={0.15}>
