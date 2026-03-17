@@ -49,6 +49,7 @@ app.include_router(forecast.router, prefix=API_PREFIX)
 app.include_router(kpi.router, prefix=API_PREFIX)
 app.include_router(optimization.router, prefix=API_PREFIX)
 app.include_router(jobs.router, prefix=API_PREFIX)
+app.include_router(supabase_data.router, prefix=API_PREFIX)
 
 # WebSocket router (no prefix — path defined in route)
 app.include_router(jobs.ws_router)
