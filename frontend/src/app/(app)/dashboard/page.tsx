@@ -1,5 +1,5 @@
 /**
- * Dashboard page — Figma-inspired KPI cards + charts.
+ * Dashboard page — healthcare white theme.
  * Fetches data from FastAPI backend.
  */
 "use client";
@@ -40,10 +40,10 @@ const DEMO_KPIS: DashboardKPIs = {
   best_model_rmse: 8.7,
   models_trained: 5,
   category_distribution: [
-    { name: "Respiratory", value: 22, color: "#22d3ee" },
-    { name: "Cardiac", value: 18, color: "#3b82f6" },
+    { name: "Respiratory", value: 22, color: "#0ea5e9" },
+    { name: "Cardiac", value: 18, color: "#2563eb" },
     { name: "Trauma", value: 15, color: "#f59e0b" },
-    { name: "GI", value: 14, color: "#a78bfa" },
+    { name: "GI", value: 14, color: "#8b5cf6" },
     { name: "Infectious", value: 12, color: "#ef4444" },
     { name: "Neurological", value: 10, color: "#10b981" },
     { name: "Other", value: 9, color: "#64748b" },
@@ -115,8 +115,8 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-cyan-400 border-t-transparent" />
+      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
       </div>
     );
   }
@@ -127,7 +127,7 @@ export default function DashboardPage() {
   const sparklinePattern = kpis.daily_ed_pattern.map((d) => d.avg_ed);
 
   return (
-    <div className="min-h-screen bg-slate-950 px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-6">
         {/* Header */}
         <DashboardHeader
@@ -138,7 +138,7 @@ export default function DashboardPage() {
 
         {/* Demo banner */}
         {isDemo && (
-          <div className="rounded-lg border border-amber-400/20 bg-amber-400/5 px-4 py-2 text-sm text-amber-400">
+          <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-2 text-sm text-amber-700">
             Showing demo data — upload a dataset via the API to see real metrics.
           </div>
         )}
@@ -154,7 +154,7 @@ export default function DashboardPage() {
           ]}
         />
 
-        {/* KPI Cards — Figma layout */}
+        {/* KPI Cards */}
         <KpiGrid
           todayForecast={kpis.today_forecast}
           weekTotal={kpis.week_total_forecast}
@@ -192,19 +192,20 @@ export default function DashboardPage() {
                   />
                   <Tooltip
                     contentStyle={{
-                      background: "#1e293b",
-                      border: "1px solid rgba(255,255,255,0.08)",
+                      background: "#ffffff",
+                      border: "1px solid #e2e8f0",
                       borderRadius: "8px",
-                      color: "#e2e8f0",
+                      color: "#1e293b",
                       fontSize: "12px",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
                     }}
                   />
                   <Line
                     type="monotone"
                     dataKey="patients"
-                    stroke="#22d3ee"
+                    stroke="#2563eb"
                     strokeWidth={2}
-                    dot={{ r: 3, fill: "#22d3ee" }}
+                    dot={{ r: 3, fill: "#2563eb" }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -229,16 +230,17 @@ export default function DashboardPage() {
                   />
                   <Tooltip
                     contentStyle={{
-                      background: "#1e293b",
-                      border: "1px solid rgba(255,255,255,0.08)",
+                      background: "#ffffff",
+                      border: "1px solid #e2e8f0",
                       borderRadius: "8px",
-                      color: "#e2e8f0",
+                      color: "#1e293b",
                       fontSize: "12px",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
                     }}
                   />
                   <Bar
                     dataKey="avg_ed"
-                    fill="#3b82f6"
+                    fill="#0ea5e9"
                     radius={[4, 4, 0, 0]}
                     opacity={0.8}
                   />
@@ -251,14 +253,14 @@ export default function DashboardPage() {
         {/* Secondary stats row */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           {[
-            { label: "Hist. Max", value: kpis.historical_max_ed, color: "text-red-400" },
-            { label: "Hist. Min", value: kpis.historical_min_ed, color: "text-cyan-400" },
-            { label: "Best Model", value: kpis.best_model_name, color: "text-amber-400" },
-            { label: "MAPE", value: `${kpis.best_model_mape}%`, color: "text-emerald-400" },
+            { label: "Hist. Max", value: kpis.historical_max_ed, color: "text-red-500" },
+            { label: "Hist. Min", value: kpis.historical_min_ed, color: "text-sky-500" },
+            { label: "Best Model", value: kpis.best_model_name, color: "text-amber-500" },
+            { label: "MAPE", value: `${kpis.best_model_mape}%`, color: "text-emerald-500" },
           ].map((stat) => (
             <div
               key={stat.label}
-              className="rounded-xl border border-white/[0.06] bg-slate-900/60 p-4"
+              className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
             >
               <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                 {stat.label}
