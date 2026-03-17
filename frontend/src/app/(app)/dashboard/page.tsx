@@ -18,6 +18,7 @@ import {
 } from "recharts";
 
 import { getMe, getDashboardKPIs, listDatasets, type DashboardKPIs, type UserInfo } from "@/lib/api";
+import InfoTooltip from "@/components/ui/Tooltip";
 import FadeIn from "@/components/ui/FadeIn";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import KpiGrid from "@/components/dashboard/KpiGrid";
