@@ -114,21 +114,15 @@ export default function UploadPage() {
     <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-extrabold text-slate-900">Upload Data</h1>
-            <p className="mt-1 text-sm text-slate-500">
-              Upload CSV, Excel, or Parquet files to start forecasting
-            </p>
-          </div>
-          <button
-            onClick={() => router.push("/dashboard")}
-            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 transition-colors hover:border-slate-300"
-          >
-            Dashboard <ArrowRight size={14} />
-          </button>
-        </div>
+        <PageHeader
+          title="Upload Data"
+          description="Import patient records, weather data, and calendar datasets for analysis"
+          icon={Upload}
+          badge="Step 1"
+          accentColor="blue"
+        />
 
+        <FadeIn delay={0.15}>
         {/* Dataset type selector */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {DATASET_TYPES.map((type) => (
