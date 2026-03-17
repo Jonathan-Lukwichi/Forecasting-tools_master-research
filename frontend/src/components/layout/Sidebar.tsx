@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import HeartbeatLogo from "@/components/ui/HeartbeatLogo";
 import {
   Home,
   LayoutDashboard,
