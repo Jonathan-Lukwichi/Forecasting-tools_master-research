@@ -133,18 +133,21 @@ export default function WelcomePage() {
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }} className="mt-12 grid gap-5 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3">
             {[
-              { icon: TrendingUp, title: "Demand Forecasting", description: "Predict patient arrivals up to 7 days ahead. Understand trends, seasonality, and patterns in emergency department visits.", color: "from-blue-600 to-sky-500", shadow: "shadow-blue-200" },
-              { icon: Users, title: "Staff Optimization", description: "Generate optimal staff schedules that balance coverage, costs, and preferences. Minimize overtime while ensuring patient safety.", color: "from-sky-500 to-cyan-400", shadow: "shadow-sky-200" },
-              { icon: BarChart3, title: "Data Exploration", description: "Visualize distributions, correlations, and temporal patterns. Understand what drives demand before making decisions.", color: "from-indigo-600 to-blue-500", shadow: "shadow-indigo-200" },
-              { icon: Brain, title: "AI-Powered Insights", description: "Receive intelligent recommendations tailored to your hospital. Actionable advice prioritized by impact.", color: "from-violet-600 to-purple-500", shadow: "shadow-violet-200" },
-              { icon: Shield, title: "Supply Management", description: "Optimize inventory levels, reduce waste, and prevent stockouts. Smart reorder alerts keep you prepared.", color: "from-emerald-600 to-teal-500", shadow: "shadow-emerald-200" },
-              { icon: Activity, title: "Real-time Dashboard", description: "Monitor KPIs at a glance. Track forecasts, model performance, staff coverage, and supply levels.", color: "from-amber-500 to-orange-500", shadow: "shadow-amber-200" },
+              { icon: TrendingUp, title: "Demand Forecasting", description: "Predict patient arrivals up to 7 days ahead. Understand trends, seasonality, and patterns in emergency department visits.", color: "from-blue-600 to-sky-500", shadow: "shadow-blue-200", core: true },
+              { icon: Users, title: "Staff Optimization", description: "Generate optimal staff schedules that balance coverage, costs, and preferences. Minimize overtime while ensuring patient safety.", color: "from-sky-500 to-cyan-400", shadow: "shadow-sky-200", core: true },
+              { icon: Shield, title: "Supply Management", description: "Optimize inventory levels, reduce waste, and prevent stockouts. Smart reorder alerts keep you prepared.", color: "from-emerald-600 to-teal-500", shadow: "shadow-emerald-200", core: true },
+              { icon: BarChart3, title: "Data Exploration", description: "Visualize distributions, correlations, and temporal patterns. Understand what drives demand before making decisions.", color: "from-indigo-600 to-blue-500", shadow: "shadow-indigo-200", core: false },
+              { icon: Brain, title: "AI-Powered Insights", description: "Receive intelligent recommendations tailored to your hospital. Actionable advice prioritized by impact.", color: "from-violet-600 to-purple-500", shadow: "shadow-violet-200", core: false },
+              { icon: Activity, title: "Real-time Dashboard", description: "Monitor KPIs at a glance. Track forecasts, model performance, staff coverage, and supply levels.", color: "from-amber-500 to-orange-500", shadow: "shadow-amber-200", core: false },
             ].map((feature) => {
               const Icon = feature.icon;
               return (
-                <motion.div key={feature.title} variants={fadeUp} className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
-                  <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${feature.color} shadow-lg ${feature.shadow}`}>
-                    <Icon size={22} className="text-white" />
+                <motion.div key={feature.title} variants={fadeUp} className={`group rounded-2xl border p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg ${feature.core ? "border-blue-200 bg-blue-50/30 ring-1 ring-blue-100" : "border-slate-200 bg-white"}`}>
+                  <div className="flex items-start justify-between">
+                    <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${feature.color} shadow-lg ${feature.shadow}`}>
+                      <Icon size={22} className="text-white" />
+                    </div>
+                    {feature.core && <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-700">Core</span>}
                   </div>
                   <h3 className="text-base font-bold text-slate-900">{feature.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-slate-600">{feature.description}</p>
