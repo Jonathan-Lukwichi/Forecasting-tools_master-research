@@ -48,6 +48,8 @@ import {
   type DatasetInfo,
   type ModelComparison,
 } from "@/lib/api";
+import PageHeader from "@/components/ui/PageHeader";
+import FadeIn from "@/components/ui/FadeIn";
 
 const METRIC_COLORS: Record<string, string> = {
   rmse: "#3b82f6",
