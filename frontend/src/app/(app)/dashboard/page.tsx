@@ -256,8 +256,9 @@ export default function DashboardPage() {
                 key={stat.label}
                 className={`rounded-xl border border-slate-200 ${stat.border} bg-white p-4 shadow-sm`}
               >
-                <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                   {stat.label}
+                  <InfoTooltip content={stat.tip} />
                 </div>
                 <div className={`mt-1 font-mono text-lg font-bold ${stat.color}`}>
                   {typeof stat.value === "number"
