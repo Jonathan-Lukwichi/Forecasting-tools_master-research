@@ -150,6 +150,7 @@ export default function ForecastPage() {
             <p className="text-sm text-slate-500">Select a dataset and model, then generate a forecast</p>
           </div>
         )}
+        </FadeIn>
       </div>
     </div>
   );
