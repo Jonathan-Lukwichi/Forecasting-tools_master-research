@@ -450,6 +450,7 @@ export default function PreparePage() {
             </button>
           </div>
         )}
+        </FadeIn>
       </div>
     </div>
   );
