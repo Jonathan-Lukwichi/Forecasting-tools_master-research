@@ -57,7 +57,7 @@ import {
   type EDAResponse,
 } from "@/lib/api";
 
-const COLORS = ["#3b82f6", "#22d3ee", "#a78bfa", "#f43f5e", "#22c55e", "#facc15", "#f97316", "#ec4899", "#6366f1", "#14b8a6", "#f59e0b", "#ef4444"];
+const COLORS = ["#3b82f6", "#0ea5e9", "#8b5cf6", "#f43f5e", "#22c55e", "#eab308", "#f97316", "#ec4899", "#6366f1", "#14b8a6", "#f59e0b", "#ef4444"];
 
 export default function ExplorePage() {
   const router = useRouter();
@@ -118,7 +118,7 @@ export default function ExplorePage() {
     <button
       onClick={() => setTab(id)}
       className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-        tab === id ? "bg-cyan-400/10 text-cyan-400 border border-cyan-400/30" : "text-slate-500 hover:text-slate-300"
+        tab === id ? "bg-blue-50 text-blue-600 border border-blue-200" : "text-slate-500 hover:text-slate-700"
       }`}
     >
       {icon} {label}
@@ -126,19 +126,19 @@ export default function ExplorePage() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-950 px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-extrabold text-white">Explore Data</h1>
-            <p className="mt-1 text-sm text-slate-400">Exploratory data analysis and visualizations</p>
+            <h1 className="text-2xl font-extrabold text-slate-900">Explore Data</h1>
+            <p className="mt-1 text-sm text-slate-500">Exploratory data analysis and visualizations</p>
           </div>
           <div className="flex gap-2">
-            <button onClick={() => router.push("/prepare")} className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-slate-900/80 px-4 py-2 text-sm text-slate-300 hover:border-white/[0.15]">
+            <button onClick={() => router.push("/prepare")} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 hover:border-slate-300">
               Prepare
             </button>
-            <button onClick={() => router.push("/dashboard")} className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-slate-900/80 px-4 py-2 text-sm text-slate-300 hover:border-white/[0.15]">
+            <button onClick={() => router.push("/dashboard")} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 hover:border-slate-300">
               Dashboard <ArrowRight size={14} />
             </button>
           </div>
@@ -146,11 +146,11 @@ export default function ExplorePage() {
 
         {/* Dataset selector */}
         <div className="flex items-center gap-3">
-          <Database size={16} className="text-slate-500" />
+          <Database size={16} className="text-slate-400" />
           <select
             value={selectedId}
             onChange={(e) => setSelectedId(e.target.value)}
-            className="rounded-lg border border-white/[0.08] bg-slate-900/80 px-3 py-2 text-sm text-white focus:border-cyan-400/40 focus:outline-none"
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-blue-400 focus:outline-none"
           >
             <option value="">— Select dataset —</option>
             {datasets.map((d) => (
@@ -159,11 +159,11 @@ export default function ExplorePage() {
               </option>
             ))}
           </select>
-          {loading && <div className="h-4 w-4 animate-spin rounded-full border-2 border-cyan-400 border-t-transparent" />}
+          {loading && <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />}
         </div>
 
         {error && (
-          <div className="flex items-center gap-2 rounded-lg border border-red-400/20 bg-red-400/5 px-4 py-3 text-sm text-red-400">
+          <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-500">
             <AlertCircle size={16} /> {error}
           </div>
         )}
@@ -179,9 +179,9 @@ export default function ExplorePage() {
                 { label: "Target Std", value: eda.target_stats.std?.toFixed(1) ?? "—" },
                 { label: "Missing Cols", value: Object.keys(eda.missing_by_column).length },
               ].map((kpi) => (
-                <div key={kpi.label} className="rounded-xl border border-white/[0.06] bg-slate-900/60 p-3">
+                <div key={kpi.label} className="rounded-xl border border-slate-200 bg-white p-3">
                   <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">{kpi.label}</div>
-                  <div className="mt-1 font-mono text-lg font-bold text-white">{kpi.value}</div>
+                  <div className="mt-1 font-mono text-lg font-bold text-slate-800">{kpi.value}</div>
                 </div>
               ))}
             </div>
@@ -198,15 +198,15 @@ export default function ExplorePage() {
             {tab === "overview" && (
               <div className="grid gap-4 lg:grid-cols-2">
                 {/* DOW Bar Chart */}
-                <div className="rounded-2xl border border-white/[0.06] bg-slate-900/40 p-4">
-                  <h3 className="mb-3 text-sm font-bold text-white">Average Arrivals by Day of Week</h3>
+                <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <h3 className="mb-3 text-sm font-bold text-slate-800">Average Arrivals by Day of Week</h3>
                   <ResponsiveContainer width="100%" height={250}>
                     <BarChart data={dowData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                      <XAxis dataKey="day" tick={{ fill: "#94a3b8", fontSize: 12 }} />
-                      <YAxis tick={{ fill: "#94a3b8", fontSize: 12 }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                      <XAxis dataKey="day" tick={{ fill: "#64748b", fontSize: 12 }} />
+                      <YAxis tick={{ fill: "#64748b", fontSize: 12 }} />
                       <Tooltip
-                        contentStyle={{ background: "#0f172a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#e2e8f0" }}
+                        contentStyle={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 8, color: "#334155" }}
                       />
                       <Bar dataKey="avg" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                     </BarChart>
@@ -214,17 +214,17 @@ export default function ExplorePage() {
                 </div>
 
                 {/* Monthly Bar Chart */}
-                <div className="rounded-2xl border border-white/[0.06] bg-slate-900/40 p-4">
-                  <h3 className="mb-3 text-sm font-bold text-white">Average Arrivals by Month</h3>
+                <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <h3 className="mb-3 text-sm font-bold text-slate-800">Average Arrivals by Month</h3>
                   <ResponsiveContainer width="100%" height={250}>
                     <BarChart data={monthData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                      <XAxis dataKey="month" tick={{ fill: "#94a3b8", fontSize: 12 }} />
-                      <YAxis tick={{ fill: "#94a3b8", fontSize: 12 }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                      <XAxis dataKey="month" tick={{ fill: "#64748b", fontSize: 12 }} />
+                      <YAxis tick={{ fill: "#64748b", fontSize: 12 }} />
                       <Tooltip
-                        contentStyle={{ background: "#0f172a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#e2e8f0" }}
+                        contentStyle={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 8, color: "#334155" }}
                       />
-                      <Bar dataKey="avg" fill="#22d3ee" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="avg" fill="#0ea5e9" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -232,27 +232,27 @@ export default function ExplorePage() {
             )}
 
             {tab === "columns" && (
-              <div className="overflow-x-auto rounded-2xl border border-white/[0.06]">
+              <div className="overflow-x-auto rounded-2xl border border-slate-200">
                 <table className="w-full text-xs">
                   <thead>
-                    <tr className="border-b border-white/[0.06] bg-slate-800/50">
+                    <tr className="border-b border-slate-200 bg-slate-50">
                       {["Column", "Type", "Non-null", "Null %", "Unique", "Mean", "Std", "Min", "Max"].map((h) => (
-                        <th key={h} className="whitespace-nowrap px-3 py-2 text-left font-semibold text-slate-400">{h}</th>
+                        <th key={h} className="whitespace-nowrap px-3 py-2 text-left font-semibold text-slate-500">{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {eda.column_summaries.map((col) => (
-                      <tr key={col.name} className="border-b border-white/[0.04] hover:bg-slate-800/30">
-                        <td className="px-3 py-1.5 font-medium text-white">{col.name}</td>
-                        <td className="px-3 py-1.5 text-slate-400">{col.dtype}</td>
-                        <td className="px-3 py-1.5 font-mono text-slate-300">{col.non_null}</td>
-                        <td className={`px-3 py-1.5 font-mono ${col.null_pct > 5 ? "text-red-400" : "text-slate-300"}`}>{col.null_pct}%</td>
-                        <td className="px-3 py-1.5 font-mono text-slate-300">{col.unique}</td>
-                        <td className="px-3 py-1.5 font-mono text-slate-300">{col.mean?.toFixed(2) ?? "—"}</td>
-                        <td className="px-3 py-1.5 font-mono text-slate-300">{col.std?.toFixed(2) ?? "—"}</td>
-                        <td className="px-3 py-1.5 font-mono text-slate-300">{col.min?.toFixed(2) ?? "—"}</td>
-                        <td className="px-3 py-1.5 font-mono text-slate-300">{col.max?.toFixed(2) ?? "—"}</td>
+                      <tr key={col.name} className="border-b border-slate-100 hover:bg-slate-50">
+                        <td className="px-3 py-1.5 font-medium text-slate-800">{col.name}</td>
+                        <td className="px-3 py-1.5 text-slate-500">{col.dtype}</td>
+                        <td className="px-3 py-1.5 font-mono text-slate-600">{col.non_null}</td>
+                        <td className={`px-3 py-1.5 font-mono ${col.null_pct > 5 ? "text-red-500" : "text-slate-600"}`}>{col.null_pct}%</td>
+                        <td className="px-3 py-1.5 font-mono text-slate-600">{col.unique}</td>
+                        <td className="px-3 py-1.5 font-mono text-slate-600">{col.mean?.toFixed(2) ?? "—"}</td>
+                        <td className="px-3 py-1.5 font-mono text-slate-600">{col.std?.toFixed(2) ?? "—"}</td>
+                        <td className="px-3 py-1.5 font-mono text-slate-600">{col.min?.toFixed(2) ?? "—"}</td>
+                        <td className="px-3 py-1.5 font-mono text-slate-600">{col.max?.toFixed(2) ?? "—"}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -263,8 +263,8 @@ export default function ExplorePage() {
             {tab === "patterns" && (
               <div className="grid gap-4 lg:grid-cols-2">
                 {/* DOW Pie */}
-                <div className="rounded-2xl border border-white/[0.06] bg-slate-900/40 p-4">
-                  <h3 className="mb-3 text-sm font-bold text-white">Day-of-Week Distribution</h3>
+                <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <h3 className="mb-3 text-sm font-bold text-slate-800">Day-of-Week Distribution</h3>
                   <ResponsiveContainer width="100%" height={280}>
                     <PieChart>
                       <Pie data={pieData} dataKey="avg" nameKey="day" cx="50%" cy="50%" outerRadius={100} label={({ name, value }) => `${name}: ${value}`}>
@@ -272,23 +272,23 @@ export default function ExplorePage() {
                           <Cell key={i} fill={entry.fill} />
                         ))}
                       </Pie>
-                      <Tooltip contentStyle={{ background: "#0f172a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#e2e8f0" }} />
+                      <Tooltip contentStyle={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 8, color: "#334155" }} />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
 
                 {/* Missing data */}
-                <div className="rounded-2xl border border-white/[0.06] bg-slate-900/40 p-4">
-                  <h3 className="mb-3 text-sm font-bold text-white">Missing Data (Top 10)</h3>
+                <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <h3 className="mb-3 text-sm font-bold text-slate-800">Missing Data (Top 10)</h3>
                   {missingData.length === 0 ? (
                     <div className="flex h-[250px] items-center justify-center text-sm text-slate-500">No missing data</div>
                   ) : (
                     <ResponsiveContainer width="100%" height={250}>
                       <BarChart data={missingData} layout="vertical">
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                        <XAxis type="number" tick={{ fill: "#94a3b8", fontSize: 11 }} unit="%" />
-                        <YAxis dataKey="column" type="category" tick={{ fill: "#94a3b8", fontSize: 11 }} width={120} />
-                        <Tooltip contentStyle={{ background: "#0f172a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#e2e8f0" }} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                        <XAxis type="number" tick={{ fill: "#64748b", fontSize: 11 }} unit="%" />
+                        <YAxis dataKey="column" type="category" tick={{ fill: "#64748b", fontSize: 11 }} width={120} />
+                        <Tooltip contentStyle={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 8, color: "#334155" }} />
                         <Bar dataKey="pct" fill="#f43f5e" radius={[0, 4, 4, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
@@ -296,13 +296,13 @@ export default function ExplorePage() {
                 </div>
 
                 {/* Target stats */}
-                <div className="rounded-2xl border border-white/[0.06] bg-slate-900/40 p-4 lg:col-span-2">
-                  <h3 className="mb-3 text-sm font-bold text-white">Target Variable Statistics</h3>
+                <div className="rounded-2xl border border-slate-200 bg-white p-4 lg:col-span-2">
+                  <h3 className="mb-3 text-sm font-bold text-slate-800">Target Variable Statistics</h3>
                   <div className="grid grid-cols-5 gap-3">
                     {Object.entries(eda.target_stats).map(([key, val]) => (
-                      <div key={key} className="rounded-lg border border-white/[0.06] bg-slate-800/40 p-3 text-center">
+                      <div key={key} className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center">
                         <div className="text-[11px] font-semibold uppercase text-slate-500">{key}</div>
-                        <div className="mt-1 font-mono text-lg font-bold text-cyan-400">{val.toFixed(1)}</div>
+                        <div className="mt-1 font-mono text-lg font-bold text-blue-600">{val.toFixed(1)}</div>
                       </div>
                     ))}
                   </div>
@@ -311,17 +311,17 @@ export default function ExplorePage() {
             )}
 
             {tab === "correlations" && (
-              <div className="rounded-2xl border border-white/[0.06] bg-slate-900/40 p-4">
-                <h3 className="mb-3 text-sm font-bold text-white">Top Correlations with Target</h3>
+              <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                <h3 className="mb-3 text-sm font-bold text-slate-800">Top Correlations with Target</h3>
                 {corrData.length === 0 ? (
                   <div className="py-8 text-center text-sm text-slate-500">No numeric correlations found</div>
                 ) : (
                   <ResponsiveContainer width="100%" height={Math.max(300, corrData.length * 35)}>
                     <BarChart data={corrData} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                      <XAxis type="number" domain={[-1, 1]} tick={{ fill: "#94a3b8", fontSize: 11 }} />
-                      <YAxis dataKey="column" type="category" tick={{ fill: "#94a3b8", fontSize: 11 }} width={140} />
-                      <Tooltip contentStyle={{ background: "#0f172a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#e2e8f0" }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                      <XAxis type="number" domain={[-1, 1]} tick={{ fill: "#64748b", fontSize: 11 }} />
+                      <YAxis dataKey="column" type="category" tick={{ fill: "#64748b", fontSize: 11 }} width={140} />
+                      <Tooltip contentStyle={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 8, color: "#334155" }} />
                       <Bar dataKey="correlation" fill="#3b82f6" radius={[0, 4, 4, 0]}>
                         {corrData.map((entry, i) => (
                           <Cell key={i} fill={entry.correlation >= 0 ? "#3b82f6" : "#f43f5e"} />
@@ -336,10 +336,10 @@ export default function ExplorePage() {
         )}
 
         {!eda && !loading && !error && (
-          <div className="rounded-2xl border border-white/[0.06] bg-slate-900/40 p-12 text-center">
-            <BarChart3 size={40} className="mx-auto mb-3 text-slate-600" />
+          <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center">
+            <BarChart3 size={40} className="mx-auto mb-3 text-slate-300" />
             <p className="text-sm text-slate-500">Select a dataset above to explore</p>
-            <p className="mt-1 text-xs text-slate-600">Upload and fuse data first if you haven&apos;t already</p>
+            <p className="mt-1 text-xs text-slate-400">Upload and fuse data first if you haven&apos;t already</p>
           </div>
         )}
       </div>
