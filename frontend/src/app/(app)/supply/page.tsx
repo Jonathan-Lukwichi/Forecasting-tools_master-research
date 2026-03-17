@@ -75,7 +75,7 @@ export default function SupplyPage() {
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl space-y-6">
-        <PageHeader title="Supply Planner" description="Manage inventory levels, prevent stockouts, and reduce waste" icon={Package} badge="Step 8" accentColor="red" />
+        <PageHeader title="Supply Planner" description="Manage inventory levels, prevent stockouts, and reduce waste" icon={Package} badge="Step 8" accentColor="red" images={["/images/supply-bg.jpg"]} />
 
         <FadeIn delay={0.15}>
         {/* Config */}
