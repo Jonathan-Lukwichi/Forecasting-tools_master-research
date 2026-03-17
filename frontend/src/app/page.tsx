@@ -38,13 +38,31 @@ const fadeUp = {
 };
 
 export default function WelcomePage() {
+  const [heroIndex, setHeroIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setHeroIndex((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
 
-      {/* ========== HERO — Dark blue overlay, white readable text ========== */}
-      <section className="relative overflow-hidden bg-slate-900">
-        <Image src="/images/hero-bg2.jpg" alt="" fill className="object-cover opacity-30" priority />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-blue-900/60 to-slate-900/90" />
+      {/* ========== HERO — Slideshow background, lighter overlay ========== */}
+      <section className="relative overflow-hidden bg-slate-800">
+        {HERO_SLIDES.map((src, i) => (
+          <Image
+            key={src}
+            src={src}
+            alt=""
+            fill
+            className={`object-cover transition-none ${i === heroIndex ? "opacity-50" : "opacity-0"}`}
+            priority={i === 0}
+          />
+        ))}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-blue-900/40 to-slate-900/70" />
 
         {/* Nav */}
         <nav className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-4 py-5 sm:px-6">
