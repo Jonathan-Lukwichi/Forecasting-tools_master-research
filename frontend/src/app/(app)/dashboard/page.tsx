@@ -203,6 +203,12 @@ export default function DashboardPage() {
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={kpis.daily_ed_pattern}>
+                    <defs>
+                      <linearGradient id="colorBar" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.9} />
+                        <stop offset="95%" stopColor="#2563eb" stopOpacity={0.7} />
+                      </linearGradient>
+                    </defs>
                     <XAxis
                       dataKey="day"
                       axisLine={false}
