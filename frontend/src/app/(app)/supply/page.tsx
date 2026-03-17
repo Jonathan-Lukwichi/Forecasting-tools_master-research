@@ -199,6 +199,7 @@ export default function SupplyPage() {
             <p className="text-sm text-slate-500">Configure items and run the inventory optimizer</p>
           </div>
         )}
+        </FadeIn>
       </div>
     </div>
   );
