@@ -1,6 +1,6 @@
 import { expect, test, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
-import ActionsPage from "../../src/app/actions/page";
+import ActionsPage from "../../src/app/(app)/actions/page";
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 vi.mock("@/lib/api", () => ({
