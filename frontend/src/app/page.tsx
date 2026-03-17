@@ -252,6 +252,7 @@ export default function WelcomePage() {
                 </div>
               </div>
               <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-400">Platform Performance</h3>
                 {[
                   { label: "Forecast Accuracy", value: 96, color: "bg-blue-500" },
                   { label: "Staff Coverage", value: 94, color: "bg-sky-500" },
