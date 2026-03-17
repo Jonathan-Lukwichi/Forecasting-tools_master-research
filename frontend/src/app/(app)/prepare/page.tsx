@@ -46,6 +46,8 @@ import {
   type FuseResponse,
   type FeatureEngineeringResponse,
 } from "@/lib/api";
+import PageHeader from "@/components/ui/PageHeader";
+import FadeIn from "@/components/ui/FadeIn";
 
 export default function PreparePage() {
   const router = useRouter();
