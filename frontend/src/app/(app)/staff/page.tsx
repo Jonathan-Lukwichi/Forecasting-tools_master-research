@@ -67,7 +67,7 @@ export default function StaffPage() {
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl space-y-6">
-        <PageHeader title="Staff Planner" description="Optimize staff schedules to balance coverage, costs, and patient safety" icon={Users} badge="Step 7" accentColor="emerald" />
+        <PageHeader title="Staff Planner" description="Optimize staff schedules to balance coverage, costs, and patient safety" icon={Users} badge="Step 7" accentColor="emerald" images={["/images/staff-bg.jpg"]} />
 
         <FadeIn delay={0.15}>
         {/* Config */}
