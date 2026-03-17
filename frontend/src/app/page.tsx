@@ -70,10 +70,15 @@ export default function WelcomePage() {
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-8 flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-4">
             <Link href="/login" className="group flex w-full items-center justify-center gap-2 rounded-xl bg-white px-8 py-3.5 text-sm font-bold text-blue-700 shadow-xl transition-all hover:bg-blue-50 sm:w-auto">
-              Launch Dashboard <ChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+              Start Here <ChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />
             </Link>
             <a href="#features" className="w-full rounded-xl border-2 border-white/30 px-8 py-3.5 text-sm font-semibold text-white transition-all hover:border-white/60 hover:bg-white/10 sm:w-auto">Learn More</a>
           </motion.div>
+
+          {/* University affiliation */}
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.5 }} className="mt-8 text-xs font-medium tracking-wide text-blue-300/60">
+            Master Thesis Research — South Africa
+          </motion.p>
         </div>
       </section>
 
