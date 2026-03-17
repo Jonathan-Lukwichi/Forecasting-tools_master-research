@@ -57,9 +57,7 @@ export default function Sidebar() {
       <div className="border-b border-slate-100 px-4 py-5">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-sky-400 text-sm font-black text-white shadow-md shadow-blue-200">
-              H
-            </div>
+            <HeartbeatLogo size={32} />
             <div>
               <div className="text-sm font-bold text-slate-800">HealthForecast</div>
               <div className="text-[10px] font-medium text-slate-400">AI Platform</div>
