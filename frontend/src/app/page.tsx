@@ -186,7 +186,7 @@ export default function WelcomePage() {
           </div>
           {/* Glow effect */}
           <div className="absolute -bottom-8 left-1/2 h-32 w-3/4 -translate-x-1/2 rounded-full bg-blue-100/40 blur-[60px]" />
-        </div>
+        </motion.div>
       </section>
 
       {/* Stats Bar */}
