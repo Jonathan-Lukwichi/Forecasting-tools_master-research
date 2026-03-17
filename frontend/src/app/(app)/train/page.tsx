@@ -281,19 +281,27 @@ export default function TrainPage() {
           <div className="rounded-2xl border border-slate-200 bg-white p-5">
             <h2 className="mb-4 text-sm font-bold text-slate-800">Select ML Model</h2>
             <div className="mb-4 grid grid-cols-3 gap-3">
-              {ML_MODELS.map((m) => (
-                <button
-                  key={m.value}
-                  onClick={() => setMlModel(m.value)}
-                  className={`rounded-xl border p-3 text-left transition-all ${
-                    mlModel === m.value ? "border-blue-200 bg-blue-50" : "border-slate-200 bg-white hover:border-slate-300"
-                  }`}
-                >
-                  <span className="text-lg">{m.icon}</span>
-                  <div className="mt-1 text-sm font-semibold text-slate-800">{m.label}</div>
-                  <div className="text-[11px] text-slate-500">{m.desc}</div>
-                </button>
-              ))}
+              {ML_MODELS.map((m) => {
+                const colors = MODEL_COLORS[m.value] || { border: "border-slate-300", bg: "bg-slate-50", ring: "ring-slate-200", strip: "bg-slate-500", text: "text-slate-700" };
+                const selected = mlModel === m.value;
+                return (
+                  <button
+                    key={m.value}
+                    onClick={() => setMlModel(m.value)}
+                    className={`cursor-pointer overflow-hidden rounded-xl border-2 text-left transition-all hover:shadow-md ${
+                      selected ? `${colors.border} ${colors.bg} ring-2 ${colors.ring}` : "border-slate-200 bg-white hover:border-slate-300"
+                    }`}
+                  >
+                    <div className={`h-1 ${colors.strip}`} />
+                    <div className="p-4">
+                      <div className="text-2xl mb-2">{m.icon}</div>
+                      <h3 className="text-sm font-bold text-slate-900">{m.label}</h3>
+                      <p className="mt-1 text-xs text-slate-500">{m.desc}</p>
+                      <p className={`mt-2 text-[11px] font-medium ${colors.text}`}>{MODEL_BEST_FOR[m.value] || ""}</p>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
 
             <div className="mb-4 flex items-center gap-4">
