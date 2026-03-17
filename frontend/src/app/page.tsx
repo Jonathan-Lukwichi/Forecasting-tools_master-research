@@ -68,27 +68,47 @@ export default function WelcomePage() {
       {/* Hero Section */}
       <section className="relative z-10 mx-auto max-w-7xl px-4 pb-12 pt-10 text-center sm:px-6 sm:pb-20 sm:pt-16">
         {/* Badge */}
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-1.5 sm:mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-1.5 sm:mb-8"
+        >
           <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-500" />
           <span className="text-xs font-medium text-blue-600">
             Intelligent Hospital Resource Planning
           </span>
-        </div>
+        </motion.div>
 
-        <h1 className="mx-auto max-w-4xl text-3xl font-extrabold leading-[1.1] tracking-tight text-slate-900 sm:text-5xl lg:text-7xl">
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="mx-auto max-w-4xl text-3xl font-extrabold leading-[1.1] tracking-tight text-slate-900 sm:text-5xl lg:text-7xl"
+        >
           Smarter Hospitals,{" "}
           <span className="bg-gradient-to-r from-blue-600 via-sky-500 to-blue-400 bg-clip-text text-transparent">
             Powered by AI
           </span>
-        </h1>
+        </motion.h1>
 
-        <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-slate-500 sm:mt-6 sm:text-lg">
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-slate-500 sm:mt-6 sm:text-lg"
+        >
           Forecast patient demand, optimize staff schedules, and manage supplies
           with confidence. HealthForecast AI transforms hospital data into
           actionable insights that save time, reduce costs, and improve patient care.
-        </p>
+        </motion.p>
 
-        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="mt-8 flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-4"
+        >
           <Link
             href="/login"
             className="group flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition-all hover:shadow-xl hover:shadow-blue-300 sm:w-auto"
