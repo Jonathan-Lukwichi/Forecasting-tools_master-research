@@ -333,7 +333,7 @@ export default function UploadPage() {
           <div className="grid gap-3 text-xs text-slate-500 sm:grid-cols-2">
             <div>
               <span className="font-semibold text-slate-700">Patient data</span>
-              <p>Must include a date column and ED patient count. Example columns: Date, ED, Reason</p>
+              <p>Must include a date column and daily patient arrival count. Example columns: Date, ED, Reason</p>
             </div>
             <div>
               <span className="font-semibold text-slate-700">Weather data</span>
