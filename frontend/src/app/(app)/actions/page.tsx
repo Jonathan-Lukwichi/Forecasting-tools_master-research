@@ -83,7 +83,7 @@ export default function ActionsPage() {
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl space-y-6">
-        <PageHeader title="Action Center" description="AI-powered recommendations tailored to your hospital's situation" icon={Zap} badge="Step 9" accentColor="violet" />
+        <PageHeader title="Action Center" description="AI-powered recommendations tailored to your hospital's situation" icon={Zap} badge="Step 9" accentColor="violet" images={["/images/actions-bg.jpg"]} />
 
         <FadeIn delay={0.15}>
         {/* Controls */}
