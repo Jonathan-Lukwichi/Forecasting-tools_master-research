@@ -183,11 +183,14 @@ export default function TrainPage() {
     <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-extrabold text-slate-900">Train Models</h1>
-            <p className="mt-1 text-sm text-slate-500">Train ML and statistical forecasting models</p>
-          </div>
+        <PageHeader
+          title="Train Models"
+          description="Build, tune, and compare forecasting models on your data"
+          icon={Cpu}
+          badge="Step 4"
+          accentColor="violet"
+        />
+        <div className="flex justify-end -mt-2">
           <button
             onClick={() => router.push("/results")}
             className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 hover:border-slate-300 hover:bg-slate-50"
@@ -196,6 +199,7 @@ export default function TrainPage() {
           </button>
         </div>
 
+        <FadeIn delay={0.15}>
         {/* Dataset selector */}
         <div className="flex items-center gap-3">
           <Cpu size={16} className="text-slate-500" />
