@@ -103,6 +103,7 @@ export default function ResultsPage() {
           icon={Trophy}
           badge="Step 5"
           accentColor="amber"
+          images={["/images/results-bg.jpg"]}
         />
         <div className="flex justify-end gap-2 -mt-2">
           <button onClick={() => router.push("/train")} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 hover:border-slate-300 hover:bg-slate-50">
