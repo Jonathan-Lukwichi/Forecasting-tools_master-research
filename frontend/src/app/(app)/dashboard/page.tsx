@@ -246,14 +246,14 @@ export default function DashboardPage() {
         <FadeIn delay={0.3}>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {[
-              { label: "Hist. Max", value: kpis.historical_max_ed, color: "text-red-500" },
-              { label: "Hist. Min", value: kpis.historical_min_ed, color: "text-sky-500" },
-              { label: "Best Model", value: kpis.best_model_name, color: "text-amber-500" },
-              { label: "MAPE", value: `${kpis.best_model_mape}%`, color: "text-emerald-500" },
+              { label: "Hist. Max", value: kpis.historical_max_ed, color: "text-red-500", border: "border-l-4 border-l-red-400" },
+              { label: "Hist. Min", value: kpis.historical_min_ed, color: "text-sky-500", border: "border-l-4 border-l-sky-400" },
+              { label: "Best Model", value: kpis.best_model_name, color: "text-amber-500", border: "border-l-4 border-l-amber-400" },
+              { label: "MAPE", value: `${kpis.best_model_mape}%`, color: "text-emerald-500", border: "border-l-4 border-l-emerald-400" },
             ].map((stat) => (
               <div
                 key={stat.label}
-                className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+                className={`rounded-xl border border-slate-200 ${stat.border} bg-white p-4 shadow-sm`}
               >
                 <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                   {stat.label}
