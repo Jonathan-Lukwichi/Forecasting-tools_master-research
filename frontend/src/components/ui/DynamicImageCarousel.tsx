@@ -15,29 +15,29 @@ interface DynamicImageCarouselProps {
 
 const VARIANTS = {
   fade: {
-    enter: { opacity: 0 },
-    center: { opacity: 1 },
-    exit: { opacity: 0 },
+    enter: { opacity: 0, scale: 1 },
+    center: { opacity: 1, scale: 1.06 },
+    exit: { opacity: 0, scale: 1.06 },
   },
   slideLeft: {
-    enter: { opacity: 0, x: 80 },
-    center: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: -80 },
+    enter: { opacity: 0, x: 60, scale: 1 },
+    center: { opacity: 1, x: 0, scale: 1.05 },
+    exit: { opacity: 0, x: -60, scale: 1.05 },
   },
   slideRight: {
-    enter: { opacity: 0, x: -80 },
-    center: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: 80 },
+    enter: { opacity: 0, x: -60, scale: 1 },
+    center: { opacity: 1, x: 0, scale: 1.05 },
+    exit: { opacity: 0, x: 60, scale: 1.05 },
   },
   slideUp: {
-    enter: { opacity: 0, y: 60 },
-    center: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -60 },
+    enter: { opacity: 0, y: 40, scale: 1 },
+    center: { opacity: 1, y: 0, scale: 1.05 },
+    exit: { opacity: 0, y: -40, scale: 1.05 },
   },
   slideDown: {
-    enter: { opacity: 0, y: -60 },
-    center: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: 60 },
+    enter: { opacity: 0, y: -40, scale: 1 },
+    center: { opacity: 1, y: 0, scale: 1.05 },
+    exit: { opacity: 0, y: 40, scale: 1.05 },
   },
   zoom: {
     enter: { opacity: 0, scale: 1.15 },
@@ -83,29 +83,11 @@ export default function DynamicImageCarousel({
             alt=""
             fill
             className="object-cover"
-            sizes="(max-width: 768px) 100vw, 50vw"
+            sizes="(max-width: 768px) 100vw, 60vw"
             priority={priority && current === 0}
           />
         </motion.div>
       </AnimatePresence>
-      {/* Ken Burns slow zoom on the visible image */}
-      {animation !== "zoom" && (
-        <motion.div
-          key={`zoom-${current}`}
-          initial={{ scale: 1 }}
-          animate={{ scale: 1.08 }}
-          transition={{ duration: interval / 1000, ease: "linear" }}
-          className="absolute inset-0"
-        >
-          <Image
-            src={images[current]}
-            alt=""
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 50vw"
-          />
-        </motion.div>
-      )}
       {/* Overlay */}
       {overlay && <div className={`absolute inset-0 ${overlay}`} />}
     </div>
