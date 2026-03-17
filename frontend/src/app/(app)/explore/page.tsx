@@ -56,6 +56,8 @@ import {
   type DatasetInfo,
   type EDAResponse,
 } from "@/lib/api";
+import PageHeader from "@/components/ui/PageHeader";
+import FadeIn from "@/components/ui/FadeIn";
 
 const COLORS = ["#3b82f6", "#0ea5e9", "#8b5cf6", "#f43f5e", "#22c55e", "#eab308", "#f97316", "#ec4899", "#6366f1", "#14b8a6", "#f59e0b", "#ef4444"];
 
