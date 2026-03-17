@@ -109,31 +109,8 @@ export default function WelcomePage() {
         </div>
       </section>
 
-      {/* ========== Dashboard Preview — static carousel image ========== */}
-      <section className="relative z-10 mx-auto -mt-16 max-w-5xl px-4 sm:-mt-20 sm:px-6">
-        <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }}>
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-4 py-3">
-              <div className="flex items-center gap-2">
-                <div className="h-3 w-3 rounded-full bg-red-400" />
-                <div className="h-3 w-3 rounded-full bg-amber-400" />
-                <div className="h-3 w-3 rounded-full bg-emerald-400" />
-              </div>
-              <div className="hidden rounded-md border border-slate-200 bg-white px-3 py-1 text-[10px] text-slate-400 sm:block">healthforecast-ai.vercel.app/dashboard</div>
-              <div className="flex items-center gap-1">
-                <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[9px] font-semibold text-emerald-600">LIVE</span>
-              </div>
-            </div>
-            <div className="relative h-56 sm:h-72 md:h-80">
-              <Image src="/images/carousel-1.jpg" alt="Analytics dashboard" fill className="object-cover" />
-            </div>
-          </div>
-        </motion.div>
-      </section>
-
       {/* ========== Stats ========== */}
-      <section className="mt-16 border-y border-slate-200 bg-slate-50">
+      <section className="border-y border-slate-200 bg-slate-50">
         <div className="mx-auto grid max-w-5xl grid-cols-2 divide-x divide-slate-200 sm:grid-cols-4">
           {[
             { value: "7-Day", label: "Forecast Horizon" },
