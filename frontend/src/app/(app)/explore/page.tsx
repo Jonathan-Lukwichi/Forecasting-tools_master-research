@@ -137,6 +137,7 @@ export default function ExplorePage() {
           icon={BarChart3}
           badge="Step 3"
           accentColor="indigo"
+          images={["/images/explore-bg.jpg"]}
         />
 
         <FadeIn delay={0.15}>
