@@ -3,7 +3,7 @@
  */
 import { expect, test, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
-import TrainPage from "../../src/app/train/page";
+import TrainPage from "../../src/app/(app)/train/page";
 
 const mockPush = vi.fn();
 vi.mock("next/navigation", () => ({
