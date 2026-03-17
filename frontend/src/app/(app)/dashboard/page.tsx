@@ -246,10 +246,10 @@ export default function DashboardPage() {
         <FadeIn delay={0.3}>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {[
-              { label: "Hist. Max", value: kpis.historical_max_ed, color: "text-red-500", border: "border-l-4 border-l-red-400" },
-              { label: "Hist. Min", value: kpis.historical_min_ed, color: "text-sky-500", border: "border-l-4 border-l-sky-400" },
-              { label: "Best Model", value: kpis.best_model_name, color: "text-amber-500", border: "border-l-4 border-l-amber-400" },
-              { label: "MAPE", value: `${kpis.best_model_mape}%`, color: "text-emerald-500", border: "border-l-4 border-l-emerald-400" },
+              { label: "Hist. Max", value: kpis.historical_max_ed, color: "text-red-500", border: "border-l-4 border-l-red-400", tip: "Highest daily patient count recorded" },
+              { label: "Hist. Min", value: kpis.historical_min_ed, color: "text-sky-500", border: "border-l-4 border-l-sky-400", tip: "Lowest daily patient count recorded" },
+              { label: "Best Model", value: kpis.best_model_name, color: "text-amber-500", border: "border-l-4 border-l-amber-400", tip: "Top-performing forecasting model" },
+              { label: "MAPE", value: `${kpis.best_model_mape}%`, color: "text-emerald-500", border: "border-l-4 border-l-emerald-400", tip: "Mean Absolute Percentage Error — lower is better" },
             ].map((stat) => (
               <div
                 key={stat.label}
