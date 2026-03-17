@@ -33,10 +33,10 @@ import {
 } from "@/lib/api";
 
 const PRIORITY_CONFIG = {
-  CRITICAL: { color: "text-red-400", bg: "bg-red-400/10", border: "border-red-400/30", icon: ShieldAlert },
-  HIGH: { color: "text-yellow-400", bg: "bg-yellow-400/10", border: "border-yellow-400/30", icon: AlertTriangle },
-  MEDIUM: { color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-400/30", icon: Info },
-  LOW: { color: "text-emerald-400", bg: "bg-emerald-400/10", border: "border-emerald-400/30", icon: CheckCircle },
+  CRITICAL: { color: "text-red-500", bg: "bg-red-50", border: "border-red-200", icon: ShieldAlert },
+  HIGH: { color: "text-red-500", bg: "bg-red-50", border: "border-red-200", icon: AlertTriangle },
+  MEDIUM: { color: "text-amber-500", bg: "bg-amber-50", border: "border-amber-200", icon: Info },
+  LOW: { color: "text-blue-500", bg: "bg-blue-50", border: "border-blue-200", icon: CheckCircle },
 };
 
 type Context = "staff" | "supply" | "general";
@@ -79,22 +79,22 @@ export default function ActionsPage() {
   }, {}) ?? {};
 
   return (
-    <div className="min-h-screen bg-slate-950 px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-extrabold text-white">Action Center</h1>
-            <p className="mt-1 text-sm text-slate-400">AI-powered recommendations for hospital resource management</p>
+            <h1 className="text-2xl font-extrabold text-slate-900">Action Center</h1>
+            <p className="mt-1 text-sm text-slate-500">AI-powered recommendations for hospital resource management</p>
           </div>
-          <button onClick={() => router.push("/dashboard")} className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-slate-900/80 px-4 py-2 text-sm text-slate-300 hover:border-white/[0.15]">
+          <button onClick={() => router.push("/dashboard")} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 hover:border-slate-300 hover:bg-slate-50">
             Dashboard
           </button>
         </div>
 
         {/* Controls */}
         <div className="flex flex-wrap items-center gap-3">
-          <select value={selectedId} onChange={(e) => setSelectedId(e.target.value)} className="rounded-lg border border-white/[0.08] bg-slate-900/80 px-3 py-2 text-sm text-white focus:border-cyan-400/40 focus:outline-none">
+          <select value={selectedId} onChange={(e) => setSelectedId(e.target.value)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-blue-400 focus:outline-none">
             <option value="">— Dataset —</option>
             {datasets.map((d) => <option key={d.dataset_id} value={d.dataset_id}>{(d.metadata as Record<string, string>)?.type} · {d.dataset_id.slice(0, 8)}…</option>)}
           </select>
@@ -109,7 +109,7 @@ export default function ActionsPage() {
                 key={c.id}
                 onClick={() => setContext(c.id)}
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-all ${
-                  context === c.id ? "bg-cyan-400/10 text-cyan-400 border border-cyan-400/30" : "text-slate-500 hover:text-slate-300 border border-transparent"
+                  context === c.id ? "bg-blue-50 text-blue-600 border border-blue-200" : "text-slate-500 hover:text-slate-700 border border-transparent"
                 }`}
               >
                 {c.icon} {c.label}
@@ -117,19 +117,19 @@ export default function ActionsPage() {
             ))}
           </div>
 
-          <button onClick={handleGenerate} disabled={!selectedId || loading} className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-40">
+          <button onClick={handleGenerate} disabled={!selectedId || loading} className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-sky-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm disabled:opacity-40">
             {loading ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} />}
             Generate Recommendations
           </button>
         </div>
 
-        {error && <div className="flex items-center gap-2 rounded-lg border border-red-400/20 bg-red-400/5 px-4 py-3 text-sm text-red-400"><AlertCircle size={16} /> {error}</div>}
+        {error && <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600"><AlertCircle size={16} /> {error}</div>}
 
         {/* Recommendations */}
         {response && (
           <>
             <div className="flex items-center gap-2 text-sm text-slate-500">
-              <Sparkles size={14} className="text-cyan-400" />
+              <Sparkles size={14} className="text-blue-600" />
               {response.recommendations.length} recommendations · {response.model_used} · {new Date(response.generated_at).toLocaleTimeString()}
             </div>
 
@@ -151,8 +151,8 @@ export default function ActionsPage() {
                       <div className="mb-1 flex items-center gap-2">
                         <span className={`rounded-full ${config.bg} px-2 py-0.5 text-xs font-bold ${config.color}`}>{rec.category}</span>
                       </div>
-                      <h3 className="mb-1 text-sm font-bold text-white">{rec.action}</h3>
-                      <p className="mb-2 text-sm text-slate-300">{rec.rationale}</p>
+                      <h3 className="mb-1 text-sm font-bold text-slate-800">{rec.action}</h3>
+                      <p className="mb-2 text-sm text-slate-600">{rec.rationale}</p>
                       <div className="text-xs text-slate-500">Expected impact: {rec.impact}</div>
                     </div>
                   ))}
@@ -163,10 +163,10 @@ export default function ActionsPage() {
         )}
 
         {!response && !loading && !error && (
-          <div className="rounded-2xl border border-white/[0.06] bg-slate-900/40 p-12 text-center">
-            <Zap size={40} className="mx-auto mb-3 text-slate-600" />
+          <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm">
+            <Zap size={40} className="mx-auto mb-3 text-slate-400" />
             <p className="text-sm text-slate-500">Select a dataset and context, then generate AI recommendations</p>
-            <p className="mt-1 text-xs text-slate-600">Powered by Claude / GPT for contextual hospital management insights</p>
+            <p className="mt-1 text-xs text-slate-400">Powered by Claude / GPT for contextual hospital management insights</p>
           </div>
         )}
       </div>
