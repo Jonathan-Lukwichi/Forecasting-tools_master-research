@@ -125,7 +125,7 @@ export default function WelcomePage() {
           >
             Learn More
           </a>
-        </div>
+        </motion.div>
 
         {/* Hero visual — floating dashboard preview */}
         <div className="relative mx-auto mt-12 max-w-5xl sm:mt-16">
