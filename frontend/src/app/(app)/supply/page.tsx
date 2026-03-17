@@ -118,16 +118,24 @@ export default function SupplyPage() {
                 </thead>
                 <tbody>
                   {items.map((item, i) => (
-                    <tr key={item.item_id} className="border-b border-slate-100">
+                    <tr key={item.item_id} className={`border-b border-slate-100 hover:bg-blue-50/50 transition-colors ${i % 2 === 0 ? "bg-white" : "bg-slate-50/50"}`}>
                       <td className="px-2 py-1"><input type="text" value={item.name} onChange={(e) => updateItem(i, "name", e.target.value)} className="w-28 rounded border border-slate-200 bg-white px-1.5 py-1 text-slate-800" /></td>
                       <td className="px-2 py-1"><input type="text" value={item.category} onChange={(e) => updateItem(i, "category", e.target.value)} className="w-20 rounded border border-slate-200 bg-white px-1.5 py-1 text-slate-800" /></td>
                       <td className="px-2 py-1"><input type="number" value={item.unit_cost} onChange={(e) => updateItem(i, "unit_cost", Number(e.target.value))} className="w-16 rounded border border-slate-200 bg-white px-1.5 py-1 text-slate-800" /></td>
                       <td className="px-2 py-1"><input type="number" value={item.stockout_penalty} onChange={(e) => updateItem(i, "stockout_penalty", Number(e.target.value))} className="w-16 rounded border border-slate-200 bg-white px-1.5 py-1 text-slate-800" /></td>
                       <td className="px-2 py-1"><input type="number" value={item.lead_time} onChange={(e) => updateItem(i, "lead_time", Number(e.target.value))} className="w-12 rounded border border-slate-200 bg-white px-1.5 py-1 text-slate-800" /></td>
                       <td className="px-2 py-1">
-                        <select value={item.criticality} onChange={(e) => updateItem(i, "criticality", e.target.value)} className="rounded border border-slate-200 bg-white px-1 py-1 text-slate-800">
-                          {["LOW", "MEDIUM", "HIGH", "CRITICAL"].map((c) => <option key={c}>{c}</option>)}
-                        </select>
+                        <div className="flex items-center gap-1.5">
+                          <select value={item.criticality} onChange={(e) => updateItem(i, "criticality", e.target.value)} className="rounded border border-slate-200 bg-white px-1 py-1 text-slate-800">
+                            {["LOW", "MEDIUM", "HIGH", "CRITICAL"].map((c) => <option key={c}>{c}</option>)}
+                          </select>
+                          {item.criticality === "CRITICAL" && (
+                            <span className="bg-red-100 text-red-700 border border-red-200 rounded-full px-2.5 py-0.5 text-[10px] font-bold">CRITICAL</span>
+                          )}
+                          {item.criticality === "HIGH" && (
+                            <span className="bg-amber-100 text-amber-700 border border-amber-200 rounded-full px-2.5 py-0.5 text-[10px] font-bold">HIGH</span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-2 py-1"><button onClick={() => removeItem(i)} className="text-slate-400 hover:text-red-500"><Trash2 size={14} /></button></td>
                     </tr>
