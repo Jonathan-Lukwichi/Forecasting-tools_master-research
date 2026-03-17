@@ -203,6 +203,7 @@ export default function PreparePage() {
           icon={Layers}
           badge="Step 2"
           accentColor="sky"
+          images={["/images/prepare-bg.jpg"]}
         />
 
         <FadeIn delay={0.15}>
