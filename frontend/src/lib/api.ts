@@ -565,6 +565,61 @@ export async function getRecommendations(
 }
 
 // ---------------------------------------------------------------------------
+// Supabase Data Loading
+// ---------------------------------------------------------------------------
+export interface SupabaseTableInfo {
+  table_name: string;
+  label: string;
+  description: string;
+  dataset_type: string;
+  row_count: number;
+  available: boolean;
+}
+
+export interface SupabaseTablesResponse {
+  connected: boolean;
+  tables: SupabaseTableInfo[];
+}
+
+export interface SupabaseLoadResponse {
+  dataset_id: string;
+  table_name: string;
+  label: string;
+  dataset_type: string;
+  rows: number;
+  columns: string[];
+  preview: Record<string, unknown>[];
+}
+
+export interface SupabaseLoadAllResponse {
+  datasets: SupabaseLoadResponse[];
+  errors: string[];
+}
+
+export async function getSupabaseTables(): Promise<SupabaseTablesResponse> {
+  return apiFetch<SupabaseTablesResponse>("/api/data/supabase/tables");
+}
+
+export async function loadSupabaseTable(
+  tableName: string,
+  limit?: number
+): Promise<SupabaseLoadResponse> {
+  return apiFetch<SupabaseLoadResponse>("/api/data/supabase/load", {
+    method: "POST",
+    body: JSON.stringify({ table_name: tableName, limit: limit ?? null }),
+  });
+}
+
+export async function loadSupabaseTables(
+  tables: string[]
+): Promise<SupabaseLoadAllResponse> {
+  return apiFetch<SupabaseLoadAllResponse>("/api/data/supabase/load-all", {
+    method: "POST",
+    body: JSON.stringify({ tables }),
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Health
 // ---------------------------------------------------------------------------
 export async function healthCheck(): Promise<{
