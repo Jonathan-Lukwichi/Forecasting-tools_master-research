@@ -60,6 +60,18 @@ const BASELINE_MODELS = [
   { value: "sarimax", label: "SARIMAX", icon: "📊", desc: "Seasonal ARIMA with exogenous variables" },
 ];
 
+const MODEL_COLORS: Record<string, { border: string; bg: string; ring: string; strip: string; text: string }> = {
+  xgboost: { border: "border-emerald-300", bg: "bg-emerald-50", ring: "ring-emerald-200", strip: "bg-emerald-500", text: "text-emerald-700" },
+  lstm: { border: "border-violet-300", bg: "bg-violet-50", ring: "ring-violet-200", strip: "bg-violet-500", text: "text-violet-700" },
+  ann: { border: "border-amber-300", bg: "bg-amber-50", ring: "ring-amber-200", strip: "bg-amber-500", text: "text-amber-700" },
+};
+
+const MODEL_BEST_FOR: Record<string, string> = {
+  xgboost: "Best for: Tabular data with complex patterns",
+  lstm: "Best for: Sequential time-series with long memory",
+  ann: "Best for: Non-linear relationships in data",
+};
+
 type Tab = "ml" | "baseline" | "results";
 
 export default function TrainPage() {
