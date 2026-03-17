@@ -175,17 +175,17 @@ export default function ResultsPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50">
-                    <th className="px-4 py-3 text-left font-semibold text-slate-600">#</th>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-600">Model</th>
-                    <th className="px-4 py-3 text-right font-semibold text-slate-600">RMSE</th>
-                    <th className="px-4 py-3 text-right font-semibold text-slate-600">MAE</th>
-                    <th className="px-4 py-3 text-right font-semibold text-slate-600">MAPE %</th>
-                    <th className="px-4 py-3 text-right font-semibold text-slate-600">Time (s)</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">#</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Model</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">RMSE</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">MAE</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">MAPE %</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Time (s)</th>
                   </tr>
                 </thead>
                 <tbody>
                   {comparison.models.map((m, i) => (
-                    <tr key={m.model_id} className={`border-b border-slate-100 hover:bg-slate-50 ${i === 0 ? "bg-emerald-50" : ""}`}>
+                    <tr key={m.model_id} className={`border-b border-slate-100 hover:bg-blue-50/50 transition-colors ${i === 0 ? "bg-emerald-50/50 border-l-4 border-l-emerald-400" : i % 2 === 0 ? "bg-slate-50/50" : "bg-white"}`}>
                       <td className="px-4 py-2.5 font-mono text-slate-500">{i + 1}</td>
                       <td className="px-4 py-2.5 font-medium text-slate-800">{m.model_type.toUpperCase()}</td>
                       <td className="px-4 py-2.5 text-right font-mono text-slate-800">{m.metrics.rmse.toFixed(4)}</td>
