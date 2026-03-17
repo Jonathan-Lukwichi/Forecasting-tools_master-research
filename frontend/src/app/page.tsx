@@ -251,7 +251,7 @@ export default function WelcomePage() {
                   <Image src="/images/team-bg1.jpg" alt="Healthcare team" fill className="object-cover" />
                 </div>
                 <div className="relative h-40 overflow-hidden rounded-xl border border-slate-200 shadow-md sm:h-48">
-                  <Image src="/images/carousel-4.jpg" alt="Data analytics" fill className="object-cover" />
+                  <Image src="/images/carousel-1.jpg" alt="Data analytics" fill className="object-cover" />
                 </div>
               </div>
               <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
