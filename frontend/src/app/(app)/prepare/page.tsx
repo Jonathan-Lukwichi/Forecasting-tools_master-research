@@ -164,13 +164,13 @@ export default function PreparePage() {
     const options = byType(type);
     return (
       <div>
-        <label className="mb-1.5 block text-xs font-semibold text-slate-400">
+        <label className="mb-1.5 block text-xs font-semibold text-slate-500">
           {icon} {label}
         </label>
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full rounded-lg border border-white/[0.08] bg-slate-900/80 px-3 py-2.5 text-sm text-white focus:border-cyan-400/40 focus:outline-none"
+          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 focus:border-blue-400 focus:outline-none"
         >
           <option value="">— Select —</option>
           {options.map((d) => (
@@ -185,33 +185,33 @@ export default function PreparePage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-cyan-400 border-t-transparent" />
+      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-extrabold text-white">Prepare Data</h1>
-            <p className="mt-1 text-sm text-slate-400">
+            <h1 className="text-2xl font-extrabold text-slate-900">Prepare Data</h1>
+            <p className="mt-1 text-sm text-slate-500">
               Fuse datasets and engineer features for forecasting
             </p>
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => router.push("/upload")}
-              className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-slate-900/80 px-4 py-2 text-sm text-slate-300 transition-colors hover:border-white/[0.15]"
+              className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 transition-colors hover:border-slate-300"
             >
               Upload
             </button>
             <button
               onClick={() => router.push("/explore")}
-              className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-slate-900/80 px-4 py-2 text-sm text-slate-300 transition-colors hover:border-white/[0.15]"
+              className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 transition-colors hover:border-slate-300"
             >
               Explore <ArrowRight size={14} />
             </button>
@@ -219,10 +219,10 @@ export default function PreparePage() {
         </div>
 
         {/* Step 1: Select datasets */}
-        <div className="rounded-2xl border border-white/[0.06] bg-slate-900/40 p-5">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5">
           <div className="mb-4 flex items-center gap-2">
-            <Database size={18} className="text-cyan-400" />
-            <h2 className="text-sm font-bold text-white">Step 1 — Select Datasets</h2>
+            <Database size={18} className="text-blue-600" />
+            <h2 className="text-sm font-bold text-slate-800">Step 1 — Select Datasets</h2>
           </div>
 
           {datasets.length === 0 ? (
@@ -230,7 +230,7 @@ export default function PreparePage() {
               <p className="text-sm text-slate-500">No datasets uploaded yet.</p>
               <button
                 onClick={() => router.push("/upload")}
-                className="mt-3 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 px-4 py-2 text-sm font-semibold text-white"
+                className="mt-3 rounded-lg bg-gradient-to-r from-blue-600 to-sky-500 px-4 py-2 text-sm font-semibold text-white"
               >
                 Upload Data
               </button>
@@ -247,7 +247,7 @@ export default function PreparePage() {
           <button
             onClick={handleFuse}
             disabled={!patientId || fusing}
-            className="mt-4 flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+            className="mt-4 flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-sky-500 px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {fusing ? (
               <>
@@ -264,37 +264,37 @@ export default function PreparePage() {
 
         {/* Fuse error */}
         {fuseError && (
-          <div className="flex items-center gap-2 rounded-lg border border-red-400/20 bg-red-400/5 px-4 py-3 text-sm text-red-400">
+          <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-500">
             <AlertCircle size={16} /> {fuseError}
           </div>
         )}
 
         {/* Fuse result */}
         {fuseResult && (
-          <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/5 p-5">
-            <div className="mb-3 flex items-center gap-2 text-emerald-400">
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+            <div className="mb-3 flex items-center gap-2 text-emerald-500">
               <CheckCircle2 size={18} />
               <span className="font-semibold">Fusion successful</span>
             </div>
             <div className="mb-4 grid grid-cols-3 gap-4 text-sm">
               <div>
                 <span className="text-slate-500">Dataset ID</span>
-                <div className="font-mono text-xs text-white">{fuseResult.dataset_id.slice(0, 12)}…</div>
+                <div className="font-mono text-xs text-slate-800">{fuseResult.dataset_id.slice(0, 12)}…</div>
               </div>
               <div>
                 <span className="text-slate-500">Rows</span>
-                <div className="font-mono font-medium text-white">{fuseResult.rows.toLocaleString()}</div>
+                <div className="font-mono font-medium text-slate-800">{fuseResult.rows.toLocaleString()}</div>
               </div>
               <div>
                 <span className="text-slate-500">Columns</span>
-                <div className="font-mono font-medium text-white">{fuseResult.columns.length}</div>
+                <div className="font-mono font-medium text-slate-800">{fuseResult.columns.length}</div>
               </div>
             </div>
 
             {/* Columns */}
             <div className="mb-4 flex flex-wrap gap-1.5">
               {fuseResult.columns.map((col) => (
-                <span key={col} className="rounded-md border border-white/[0.06] bg-slate-800 px-2 py-0.5 text-xs text-slate-300">
+                <span key={col} className="rounded-md border border-slate-200 bg-white px-2 py-0.5 text-xs text-slate-600">
                   {col}
                 </span>
               ))}
@@ -302,12 +302,12 @@ export default function PreparePage() {
 
             {/* Preview table */}
             {preview && previewCols.length > 0 && (
-              <div className="overflow-x-auto rounded-lg border border-white/[0.06]">
+              <div className="overflow-x-auto rounded-lg border border-slate-200">
                 <table className="w-full text-xs">
                   <thead>
-                    <tr className="border-b border-white/[0.06] bg-slate-800/50">
+                    <tr className="border-b border-slate-200 bg-slate-50">
                       {previewCols.map((col) => (
-                        <th key={col} className="whitespace-nowrap px-3 py-2 text-left font-semibold text-slate-400">
+                        <th key={col} className="whitespace-nowrap px-3 py-2 text-left font-semibold text-slate-500">
                           {col}
                         </th>
                       ))}
@@ -315,9 +315,9 @@ export default function PreparePage() {
                   </thead>
                   <tbody>
                     {preview.map((row, i) => (
-                      <tr key={i} className="border-b border-white/[0.04] hover:bg-slate-800/30">
+                      <tr key={i} className="border-b border-slate-100 hover:bg-slate-50">
                         {previewCols.map((col) => (
-                          <td key={col} className="whitespace-nowrap px-3 py-1.5 text-slate-300">
+                          <td key={col} className="whitespace-nowrap px-3 py-1.5 text-slate-600">
                             {String(row[col] ?? "—")}
                           </td>
                         ))}
@@ -332,39 +332,39 @@ export default function PreparePage() {
 
         {/* Step 2: Feature Engineering */}
         {fuseResult && (
-          <div className="rounded-2xl border border-white/[0.06] bg-slate-900/40 p-5">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5">
             <div className="mb-4 flex items-center gap-2">
-              <FlaskConical size={18} className="text-cyan-400" />
-              <h2 className="text-sm font-bold text-white">Step 2 — Feature Engineering</h2>
+              <FlaskConical size={18} className="text-blue-600" />
+              <h2 className="text-sm font-bold text-slate-800">Step 2 — Feature Engineering</h2>
             </div>
 
             <div className="mb-4 grid gap-4 sm:grid-cols-3">
               <div>
-                <label className="mb-1.5 block text-xs font-semibold text-slate-400">Lag Features (days)</label>
+                <label className="mb-1.5 block text-xs font-semibold text-slate-500">Lag Features (days)</label>
                 <input
                   type="number"
                   min={1}
                   max={30}
                   value={nLags}
                   onChange={(e) => setNLags(Number(e.target.value))}
-                  className="w-full rounded-lg border border-white/[0.08] bg-slate-900/80 px-3 py-2.5 text-sm text-white focus:border-cyan-400/40 focus:outline-none"
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 focus:border-blue-400 focus:outline-none"
                 />
-                <p className="mt-1 text-[11px] text-slate-600">Creates ED_1…ED_{nLags}</p>
+                <p className="mt-1 text-[11px] text-slate-400">Creates ED_1…ED_{nLags}</p>
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-semibold text-slate-400">Forecast Horizons</label>
+                <label className="mb-1.5 block text-xs font-semibold text-slate-500">Forecast Horizons</label>
                 <input
                   type="number"
                   min={1}
                   max={14}
                   value={nHorizons}
                   onChange={(e) => setNHorizons(Number(e.target.value))}
-                  className="w-full rounded-lg border border-white/[0.08] bg-slate-900/80 px-3 py-2.5 text-sm text-white focus:border-cyan-400/40 focus:outline-none"
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 focus:border-blue-400 focus:outline-none"
                 />
-                <p className="mt-1 text-[11px] text-slate-600">Creates Target_1…Target_{nHorizons}</p>
+                <p className="mt-1 text-[11px] text-slate-400">Creates Target_1…Target_{nHorizons}</p>
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-semibold text-slate-400">Train Ratio</label>
+                <label className="mb-1.5 block text-xs font-semibold text-slate-500">Train Ratio</label>
                 <input
                   type="number"
                   min={0.5}
@@ -372,16 +372,16 @@ export default function PreparePage() {
                   step={0.05}
                   value={trainRatio}
                   onChange={(e) => setTrainRatio(Number(e.target.value))}
-                  className="w-full rounded-lg border border-white/[0.08] bg-slate-900/80 px-3 py-2.5 text-sm text-white focus:border-cyan-400/40 focus:outline-none"
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 focus:border-blue-400 focus:outline-none"
                 />
-                <p className="mt-1 text-[11px] text-slate-600">Cal: 15% · Test: {((1 - trainRatio - 0.15) * 100).toFixed(0)}%</p>
+                <p className="mt-1 text-[11px] text-slate-400">Cal: 15% · Test: {((1 - trainRatio - 0.15) * 100).toFixed(0)}%</p>
               </div>
             </div>
 
             <button
               onClick={handleEngineer}
               disabled={engineering}
-              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-sky-500 px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {engineering ? (
                 <>
@@ -396,7 +396,7 @@ export default function PreparePage() {
             </button>
 
             {feError && (
-              <div className="mt-3 flex items-center gap-2 rounded-lg border border-red-400/20 bg-red-400/5 px-4 py-3 text-sm text-red-400">
+              <div className="mt-3 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-500">
                 <AlertCircle size={16} /> {feError}
               </div>
             )}
@@ -405,27 +405,27 @@ export default function PreparePage() {
 
         {/* Feature engineering result */}
         {feResult && (
-          <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/5 p-5">
-            <div className="mb-3 flex items-center gap-2 text-emerald-400">
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+            <div className="mb-3 flex items-center gap-2 text-emerald-500">
               <Layers size={18} />
               <span className="font-semibold">Features engineered</span>
             </div>
             <div className="mb-4 grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
               <div>
                 <span className="text-slate-500">Features</span>
-                <div className="font-mono font-medium text-white">{feResult.total_features}</div>
+                <div className="font-mono font-medium text-slate-800">{feResult.total_features}</div>
               </div>
               <div>
                 <span className="text-slate-500">Train</span>
-                <div className="font-mono font-medium text-white">{feResult.train_size.toLocaleString()}</div>
+                <div className="font-mono font-medium text-slate-800">{feResult.train_size.toLocaleString()}</div>
               </div>
               <div>
                 <span className="text-slate-500">Calibration</span>
-                <div className="font-mono font-medium text-white">{feResult.cal_size.toLocaleString()}</div>
+                <div className="font-mono font-medium text-slate-800">{feResult.cal_size.toLocaleString()}</div>
               </div>
               <div>
                 <span className="text-slate-500">Test</span>
-                <div className="font-mono font-medium text-white">{feResult.test_size.toLocaleString()}</div>
+                <div className="font-mono font-medium text-slate-800">{feResult.test_size.toLocaleString()}</div>
               </div>
             </div>
 
@@ -433,7 +433,7 @@ export default function PreparePage() {
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Feature columns</span>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {feResult.feature_names.slice(0, 30).map((f) => (
-                  <span key={f} className="rounded-md border border-cyan-400/20 bg-cyan-400/5 px-2 py-0.5 text-xs text-cyan-300">
+                  <span key={f} className="rounded-md border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs text-blue-600">
                     {f}
                   </span>
                 ))}
@@ -447,7 +447,7 @@ export default function PreparePage() {
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Target columns</span>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {feResult.target_names.map((t) => (
-                  <span key={t} className="rounded-md border border-emerald-400/20 bg-emerald-400/5 px-2 py-0.5 text-xs text-emerald-300">
+                  <span key={t} className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs text-emerald-600">
                     {t}
                   </span>
                 ))}
@@ -456,7 +456,7 @@ export default function PreparePage() {
 
             <button
               onClick={() => router.push("/explore")}
-              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-sky-500 px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
             >
               Explore Data <ArrowRight size={14} />
             </button>
