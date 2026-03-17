@@ -14,7 +14,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.config import get_settings
-from api.routes import auth, data, models, forecast, kpi, optimization, jobs
+from api.routes import auth, data, models, forecast, kpi, optimization, jobs, supabase_data
 
 settings = get_settings()
 
