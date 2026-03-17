@@ -163,6 +163,7 @@ export default function ActionsPage() {
             <p className="mt-1 text-xs text-slate-400">Powered by Claude / GPT for contextual hospital management insights</p>
           </div>
         )}
+        </FadeIn>
       </div>
     </div>
   );
