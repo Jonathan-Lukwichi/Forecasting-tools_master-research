@@ -28,7 +28,7 @@ import FadeIn from "@/components/ui/FadeIn";
 type DatasetType = "patient" | "weather" | "calendar" | "reason";
 
 const DATASET_TYPES: { value: DatasetType; label: string; description: string; icon: string }[] = [
-  { value: "patient", label: "Patient Data", description: "Daily ED arrival counts", icon: "🏥" },
+  { value: "patient", label: "Patient Data", description: "Daily patient arrival counts", icon: "🏥" },
   { value: "weather", label: "Weather Data", description: "Temperature, wind, precipitation", icon: "🌤️" },
   { value: "calendar", label: "Calendar Data", description: "Holidays and events", icon: "📅" },
   { value: "reason", label: "Reason Data", description: "Clinical reason codes", icon: "🩺" },
