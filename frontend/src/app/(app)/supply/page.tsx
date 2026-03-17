@@ -13,6 +13,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Package, AlertCircle, ArrowRight, CheckCircle2, DollarSign, Plus, Trash2 } from "lucide-react";
 import { getMe, listDatasets, optimizeInventory, type DatasetInfo, type InventoryItem, type InventoryOptimizeResponse } from "@/lib/api";
+import PageHeader from "@/components/ui/PageHeader";
+import FadeIn from "@/components/ui/FadeIn";
 
 const DEFAULT_ITEMS: InventoryItem[] = [
   { item_id: "PPE-001", name: "N95 Masks", category: "PPE", unit_cost: 2.50, stockout_penalty: 1000, lead_time: 3, usage_rate: 0.5, criticality: "CRITICAL" },
