@@ -256,28 +256,30 @@ export default function DashboardPage() {
         </FadeIn>
 
         {/* Secondary stats row */}
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {[
-            { label: "Hist. Max", value: kpis.historical_max_ed, color: "text-red-500" },
-            { label: "Hist. Min", value: kpis.historical_min_ed, color: "text-sky-500" },
-            { label: "Best Model", value: kpis.best_model_name, color: "text-amber-500" },
-            { label: "MAPE", value: `${kpis.best_model_mape}%`, color: "text-emerald-500" },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
-            >
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                {stat.label}
+        <FadeIn delay={0.3}>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {[
+              { label: "Hist. Max", value: kpis.historical_max_ed, color: "text-red-500" },
+              { label: "Hist. Min", value: kpis.historical_min_ed, color: "text-sky-500" },
+              { label: "Best Model", value: kpis.best_model_name, color: "text-amber-500" },
+              { label: "MAPE", value: `${kpis.best_model_mape}%`, color: "text-emerald-500" },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+              >
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                  {stat.label}
+                </div>
+                <div className={`mt-1 font-mono text-lg font-bold ${stat.color}`}>
+                  {typeof stat.value === "number"
+                    ? stat.value.toLocaleString()
+                    : stat.value}
+                </div>
               </div>
-              <div className={`mt-1 font-mono text-lg font-bold ${stat.color}`}>
-                {typeof stat.value === "number"
-                  ? stat.value.toLocaleString()
-                  : stat.value}
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </FadeIn>
       </div>
     </div>
   );
