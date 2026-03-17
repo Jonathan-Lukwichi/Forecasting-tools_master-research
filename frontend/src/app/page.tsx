@@ -221,7 +221,13 @@ export default function WelcomePage() {
           </p>
         </div>
 
-        <div className="mt-10 grid gap-4 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }}
+          className="mt-10 grid gap-4 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3"
+        >
           {[
             {
               icon: TrendingUp,
