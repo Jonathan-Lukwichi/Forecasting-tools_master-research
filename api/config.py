@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     project_root: str = str(Path(__file__).resolve().parent.parent)
     artifacts_dir: str = "pipeline_artifacts"
 
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+    model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
 
 
 @lru_cache
