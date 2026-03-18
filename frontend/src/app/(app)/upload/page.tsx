@@ -1,5 +1,7 @@
 /**
  * Upload page — file upload or load from Supabase database.
+ * Supports loading 4 dataset types: patient, weather, calendar, reason
+ * Updated: 2026-03-18
  */
 "use client";
 
