@@ -20,6 +20,27 @@ class UploadResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Fetch from Supabase (by hospital)
+# ---------------------------------------------------------------------------
+class FetchDatasetRequest(BaseModel):
+    """Request to fetch a dataset from Supabase filtered by hospital."""
+    dataset_type: str  # "patient", "weather", "calendar", "reason"
+    hospital_name: str
+    start_date: str | None = None  # "YYYY-MM-DD" format
+    end_date: str | None = None  # "YYYY-MM-DD" format
+
+
+class FetchDatasetResponse(BaseModel):
+    """Response after fetching a dataset from Supabase."""
+    dataset_id: str
+    dataset_type: str
+    hospital_name: str
+    rows: int
+    columns: list[str]
+    preview: list[dict[str, Any]]
+
+
+# ---------------------------------------------------------------------------
 # Validation
 # ---------------------------------------------------------------------------
 class ValidateRequest(BaseModel):

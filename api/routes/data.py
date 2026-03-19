@@ -16,6 +16,8 @@ from api.schemas.data import (
     ColumnSummary,
     EDARequest,
     EDAResponse,
+    FetchDatasetRequest,
+    FetchDatasetResponse,
     FuseRequest,
     FuseResponse,
     FeatureEngineeringRequest,
@@ -25,6 +27,10 @@ from api.schemas.data import (
     ValidateResponse,
 )
 from api.services.dataset_store import DatasetStore
+from api.services.supabase_service import (
+    get_available_hospitals,
+    fetch_dataset_by_hospital,
+)
 
 router = APIRouter(prefix="/data", tags=["Data"])
 
@@ -67,6 +73,97 @@ def upload_dataset(
         columns=list(df.columns),
         preview=preview,
         dataset_id=dataset_id,
+    )
+
+
+# ---------------------------------------------------------------------------
+# List available hospitals (from Supabase)
+# ---------------------------------------------------------------------------
+@router.get("/hospitals")
+def list_hospitals(
+    _user: dict = Depends(get_current_user),
+) -> list[str]:
+    """
+    Get list of available hospitals from Supabase.
+
+    Returns a sorted list of hospital names that have data in the database.
+    """
+    return get_available_hospitals()
+
+
+# ---------------------------------------------------------------------------
+# Fetch dataset by hospital name (from Supabase)
+# ---------------------------------------------------------------------------
+@router.post("/fetch", response_model=FetchDatasetResponse)
+def fetch_dataset(
+    body: FetchDatasetRequest,
+    _user: dict = Depends(get_current_user),
+    store: DatasetStore = Depends(get_dataset_store),
+):
+    """
+    Fetch a dataset from Supabase filtered by hospital name and date range.
+
+    This mirrors the Streamlit HospitalDataService.fetch_dataset_by_hospital().
+    """
+    df = fetch_dataset_by_hospital(
+        dataset_type=body.dataset_type,
+        hospital_name=body.hospital_name,
+        start_date=body.start_date,
+        end_date=body.end_date,
+    )
+
+    if df.empty:
+        raise HTTPException(
+            404,
+            f"No {body.dataset_type} data found for hospital '{body.hospital_name}'"
+        )
+
+    # Clean datetime column (strip timezone, standardize name)
+    dt_col = None
+    for col in ["datetime", "Date", "date", "timestamp", "ds"]:
+        if col in df.columns:
+            dt_col = col
+            break
+
+    if dt_col:
+        df[dt_col] = pd.to_datetime(df[dt_col], errors="coerce")
+        if df[dt_col].dt.tz is not None:
+            df[dt_col] = df[dt_col].dt.tz_localize(None)
+        # Standardize to 'datetime' column name
+        if dt_col != "datetime":
+            df = df.rename(columns={dt_col: "datetime"})
+
+    # Remove empty columns (all NaN or empty strings)
+    empty_cols = [
+        col for col in df.columns
+        if df[col].isna().all() or (df[col].astype(str).str.strip() == "").all()
+    ]
+    if empty_cols:
+        df = df.drop(columns=empty_cols)
+
+    # For reason dataset: remove total_arrivals (duplicates Target_1)
+    if body.dataset_type == "reason":
+        for col in list(df.columns):
+            if col.lower() == "total_arrivals":
+                df = df.drop(columns=[col])
+                break
+
+    # Store in DatasetStore
+    dataset_id = store.store(df, metadata={
+        "type": body.dataset_type,
+        "hospital": body.hospital_name,
+        "source": "supabase",
+    })
+
+    preview = df.head(5).replace({float("nan"): None}).to_dict(orient="records")
+
+    return FetchDatasetResponse(
+        dataset_id=dataset_id,
+        dataset_type=body.dataset_type,
+        hospital_name=body.hospital_name,
+        rows=len(df),
+        columns=list(df.columns),
+        preview=preview,
     )
 
 

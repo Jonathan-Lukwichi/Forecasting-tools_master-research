@@ -223,3 +223,144 @@ def list_available_tables() -> list[dict[str, Any]]:
         )
 
     return tables
+
+
+# ---------------------------------------------------------------------------
+# Hospital-based data fetching (mirrors HospitalDataService from Streamlit)
+# ---------------------------------------------------------------------------
+
+def get_available_hospitals() -> list[str]:
+    """
+    Fetch list of all available hospitals from Supabase.
+
+    Queries all data tables for unique hospital_name values.
+
+    Returns:
+        Sorted list of hospital names, or default if none found.
+    """
+    client = get_supabase_client()
+    if client is None:
+        return ["Pamplona Spain Hospital"]
+
+    hospitals_set: set[str] = set()
+
+    # Tables that have hospital_name column
+    tables_to_check = ["patient_arrivals", "weather_data", "calendar_data", "clinical_visits"]
+
+    for table_name in tables_to_check:
+        try:
+            offset = 0
+            batch_size = 1000
+
+            while True:
+                response = (
+                    client.table(table_name)
+                    .select("hospital_name")
+                    .range(offset, offset + batch_size - 1)
+                    .execute()
+                )
+
+                if response.data:
+                    for row in response.data:
+                        if row.get("hospital_name"):
+                            hospitals_set.add(row["hospital_name"])
+
+                    if len(response.data) < batch_size:
+                        break
+                    offset += batch_size
+                else:
+                    break
+
+        except Exception as exc:
+            logger.warning("Error fetching hospitals from %s: %s", table_name, exc)
+            continue
+
+    if hospitals_set:
+        return sorted(list(hospitals_set))
+
+    return ["Pamplona Spain Hospital"]
+
+
+def fetch_dataset_by_hospital(
+    dataset_type: str,
+    hospital_name: str,
+    start_date: str | None = None,
+    end_date: str | None = None,
+) -> pd.DataFrame:
+    """
+    Fetch a specific dataset filtered by hospital name and date range.
+
+    Args:
+        dataset_type: One of 'patient', 'weather', 'calendar', 'reason'
+        hospital_name: Name of the hospital to filter by
+        start_date: Optional start date (YYYY-MM-DD format)
+        end_date: Optional end date (YYYY-MM-DD format)
+
+    Returns:
+        DataFrame with the filtered data (hospital_name column removed)
+    """
+    client = get_supabase_client()
+    if client is None:
+        logger.error("Supabase client not available")
+        return pd.DataFrame()
+
+    # Map dataset_type to table name
+    table_mapping = {
+        "patient": "patient_arrivals",
+        "weather": "weather_data",
+        "calendar": "calendar_data",
+        "reason": "clinical_visits",
+    }
+
+    table_name = table_mapping.get(dataset_type)
+    if not table_name:
+        logger.error("Unknown dataset type: %s", dataset_type)
+        return pd.DataFrame()
+
+    # Get date column for this table
+    table_meta = SUPABASE_TABLES.get(table_name, {})
+    date_column = table_meta.get("date_column", "datetime")
+
+    try:
+        all_data: list[dict] = []
+        batch_size = 1000
+        offset = 0
+
+        while True:
+            query = (
+                client.table(table_name)
+                .select("*")
+                .eq("hospital_name", hospital_name)
+            )
+
+            if start_date:
+                query = query.gte(date_column, start_date)
+            if end_date:
+                query = query.lte(date_column, end_date)
+
+            query = query.order(date_column).range(offset, offset + batch_size - 1)
+            response = query.execute()
+
+            if response.data:
+                all_data.extend(response.data)
+                if len(response.data) < batch_size:
+                    break
+                offset += batch_size
+            else:
+                break
+
+        if all_data:
+            df = pd.DataFrame(all_data)
+            # Remove hospital_name column (not needed in app)
+            if "hospital_name" in df.columns:
+                df = df.drop(columns=["hospital_name"])
+            # Remove id column if present
+            if "id" in df.columns:
+                df = df.drop(columns=["id"])
+            return df
+
+        return pd.DataFrame()
+
+    except Exception as exc:
+        logger.error("Error fetching %s for hospital '%s': %s", dataset_type, hospital_name, exc)
+        return pd.DataFrame()
