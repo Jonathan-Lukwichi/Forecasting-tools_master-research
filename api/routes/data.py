@@ -121,16 +121,49 @@ def validate_dataset(
 
 
 # ---------------------------------------------------------------------------
-# Fuse datasets
+# Fuse datasets — uses proper fusion logic from app_core
 # ---------------------------------------------------------------------------
+def _find_datetime_col(df: pd.DataFrame) -> str | None:
+    """Find datetime column in DataFrame."""
+    for col in ["datetime", "Date", "date", "timestamp", "ds", "time"]:
+        if col in df.columns:
+            return col
+    return None
+
+
+def _normalize_to_date(dt_series: pd.Series) -> pd.Series:
+    """Convert datetime to date-only (midnight) for daily aggregation."""
+    return pd.to_datetime(dt_series, errors="coerce").dt.normalize()
+
+
+def _prep_for_fusion(df: pd.DataFrame, dataset_type: str) -> pd.DataFrame:
+    """
+    Prepare a dataset for fusion by creating a normalized Date column.
+    Mirrors logic from app_core/data/fusion.py but without Streamlit deps.
+    """
+    df = df.copy()
+    dt_col = _find_datetime_col(df)
+
+    if dt_col is None:
+        raise ValueError(f"{dataset_type} dataset must have a datetime column")
+
+    # Create normalized Date column for merging
+    df["Date"] = _normalize_to_date(df[dt_col])
+    df = df.dropna(subset=["Date"])
+
+    return df
+
+
 @router.post("/fuse", response_model=FuseResponse)
 def fuse_datasets(
     body: FuseRequest,
     _user: dict = Depends(get_current_user),
     store: DatasetStore = Depends(get_dataset_store),
 ):
-    from app_core.services.data_service import DataService
-
+    """
+    Fuse patient, weather, calendar, and reason datasets.
+    Uses inner joins on Date column (matching Streamlit fusion logic).
+    """
     try:
         patient_df = store.get(body.patient_dataset_id).df
     except KeyError:
@@ -158,21 +191,82 @@ def fuse_datasets(
         except KeyError:
             raise HTTPException(404, "Reason dataset not found")
 
-    svc = DataService()
-    result = svc.fuse_datasets(patient_df, weather_df, calendar_df, reason_df)
+    processing_log = []
 
-    if not result.success:
-        raise HTTPException(422, result.error or "Fusion failed")
+    try:
+        # Prepare patient data
+        p = _prep_for_fusion(patient_df, "Patient")
+        processing_log.append(f"Patient: {len(p)} rows prepared")
 
-    fused_df = result.data
-    fused_id = store.store(fused_df, metadata={"type": "fused"})
+        # Find target column (patient_count, ED, Target_1, etc.)
+        target_col = None
+        for col in ["patient_count", "ED", "Target_1", "patients", "count", "arrivals"]:
+            if col in p.columns:
+                target_col = col
+                break
 
-    return FuseResponse(
-        dataset_id=fused_id,
-        rows=len(fused_df),
-        columns=list(fused_df.columns),
-        processing_report=result.data if isinstance(result.data, dict) else {},
-    )
+        if target_col is None:
+            # Try to find any numeric column that looks like a count
+            for col in p.columns:
+                if col not in ["Date", "datetime", "date", "id", "ID"] and pd.api.types.is_numeric_dtype(p[col]):
+                    target_col = col
+                    break
+
+        if target_col and target_col != "ED":
+            p = p.rename(columns={target_col: "ED"})
+            processing_log.append(f"Renamed '{target_col}' to 'ED'")
+
+        # Start with patient data
+        merged = p.copy()
+
+        # Merge weather if provided
+        if weather_df is not None:
+            w = _prep_for_fusion(weather_df, "Weather")
+            processing_log.append(f"Weather: {len(w)} rows prepared")
+            merged = merged.merge(w, on="Date", how="inner", suffixes=("", "_weather"))
+            processing_log.append(f"After weather merge: {len(merged)} rows")
+
+        # Merge calendar if provided
+        if calendar_df is not None:
+            c = _prep_for_fusion(calendar_df, "Calendar")
+            processing_log.append(f"Calendar: {len(c)} rows prepared")
+            merged = merged.merge(c, on="Date", how="inner", suffixes=("", "_cal"))
+            processing_log.append(f"After calendar merge: {len(merged)} rows")
+
+        # Merge reason if provided
+        if reason_df is not None:
+            r = _prep_for_fusion(reason_df, "Reason")
+            processing_log.append(f"Reason: {len(r)} rows prepared")
+            merged = merged.merge(r, on="Date", how="inner", suffixes=("", "_reason"))
+            processing_log.append(f"After reason merge: {len(merged)} rows")
+
+        if merged.empty:
+            raise HTTPException(
+                422,
+                "Fusion resulted in empty dataset. Check that datasets have overlapping date ranges."
+            )
+
+        # Remove duplicate columns (from suffixes)
+        merged = merged.loc[:, ~merged.columns.duplicated()]
+
+        # Sort by date
+        merged = merged.sort_values("Date").reset_index(drop=True)
+
+        processing_log.append(f"Final: {len(merged)} rows, {len(merged.columns)} columns")
+
+        fused_id = store.store(merged, metadata={"type": "fused"})
+
+        return FuseResponse(
+            dataset_id=fused_id,
+            rows=len(merged),
+            columns=list(merged.columns),
+            processing_report={"log": processing_log},
+        )
+
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+    except Exception as e:
+        raise HTTPException(500, f"Fusion failed: {str(e)}")
 
 
 # ---------------------------------------------------------------------------
