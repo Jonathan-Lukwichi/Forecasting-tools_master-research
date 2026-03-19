@@ -2,6 +2,7 @@
 Background job management endpoints.
 
 Provides REST polling and WebSocket streaming for Celery task progress.
+Falls back to synchronous execution when Celery/Redis is not available.
 
 === TRIANGULATION RECORD ===
 Task: Job status API for background ML training tasks
@@ -28,6 +29,7 @@ Verdict: PROCEED
 from __future__ import annotations
 
 import asyncio
+import uuid
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
@@ -35,6 +37,19 @@ from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisco
 from api.dependencies import get_current_user
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
+
+# In-memory store for synchronous job results (fallback when Celery unavailable)
+_sync_results: dict[str, dict[str, Any]] = {}
+
+# Check if Celery/Redis is available
+_celery_available = False
+try:
+    from api.workers.celery_app import celery_app
+    # Try to ping Redis
+    celery_app.control.ping(timeout=1)
+    _celery_available = True
+except Exception:
+    _celery_available = False
 
 
 def _get_celery():
@@ -51,19 +66,39 @@ def submit_training_job(
     body: dict[str, Any],
     _user: dict = Depends(get_current_user),
 ) -> dict[str, str]:
-    """Submit an ML training job to the Celery queue. Returns job_id immediately."""
-    from api.workers.training_tasks import train_ml_model
+    """Submit an ML training job. Uses Celery if available, else runs synchronously."""
 
-    task = train_ml_model.delay(
-        dataset_id=body["dataset_id"],
-        model_type=body["model_type"],
-        horizons=body.get("horizons", [1, 2, 3, 4, 5, 6, 7]),
-        hyperparameters=body.get("hyperparameters", {}),
-        auto_tune=body.get("auto_tune", False),
-        n_trials=body.get("n_trials", 50),
-    )
+    if _celery_available:
+        # Async mode: submit to Celery queue
+        from api.workers.training_tasks import train_ml_model
+        task = train_ml_model.delay(
+            dataset_id=body["dataset_id"],
+            model_type=body["model_type"],
+            horizons=body.get("horizons", [1, 2, 3, 4, 5, 6, 7]),
+            hyperparameters=body.get("hyperparameters", {}),
+            auto_tune=body.get("auto_tune", False),
+            n_trials=body.get("n_trials", 50),
+        )
+        return {"job_id": task.id, "status": "queued"}
 
-    return {"job_id": task.id, "status": "queued"}
+    # Sync fallback: run training directly
+    job_id = str(uuid.uuid4())
+    _sync_results[job_id] = {"job_id": job_id, "status": "running", "progress": 0.1}
+
+    try:
+        result = _run_ml_training_sync(
+            dataset_id=body["dataset_id"],
+            model_type=body["model_type"],
+            horizons=body.get("horizons", [1, 2, 3, 4, 5, 6, 7]),
+            hyperparameters=body.get("hyperparameters", {}),
+            auto_tune=body.get("auto_tune", False),
+            n_trials=body.get("n_trials", 50),
+        )
+        _sync_results[job_id] = {"job_id": job_id, "status": "completed", "progress": 1.0, "result": result}
+    except Exception as e:
+        _sync_results[job_id] = {"job_id": job_id, "status": "failed", "error": str(e)}
+
+    return {"job_id": job_id, "status": "queued"}
 
 
 @router.post("/train/baseline")
@@ -71,18 +106,36 @@ def submit_baseline_job(
     body: dict[str, Any],
     _user: dict = Depends(get_current_user),
 ) -> dict[str, str]:
-    """Submit a baseline model training job."""
-    from api.workers.training_tasks import train_baseline_model
+    """Submit a baseline model training job. Uses Celery if available, else runs synchronously."""
 
-    task = train_baseline_model.delay(
-        dataset_id=body["dataset_id"],
-        model_type=body["model_type"],
-        order=body.get("order"),
-        seasonal_order=body.get("seasonal_order"),
-        auto_order=body.get("auto_order", True),
-    )
+    if _celery_available:
+        from api.workers.training_tasks import train_baseline_model
+        task = train_baseline_model.delay(
+            dataset_id=body["dataset_id"],
+            model_type=body["model_type"],
+            order=body.get("order"),
+            seasonal_order=body.get("seasonal_order"),
+            auto_order=body.get("auto_order", True),
+        )
+        return {"job_id": task.id, "status": "queued"}
 
-    return {"job_id": task.id, "status": "queued"}
+    # Sync fallback
+    job_id = str(uuid.uuid4())
+    _sync_results[job_id] = {"job_id": job_id, "status": "running", "progress": 0.1}
+
+    try:
+        result = _run_baseline_training_sync(
+            dataset_id=body["dataset_id"],
+            model_type=body["model_type"],
+            order=body.get("order"),
+            seasonal_order=body.get("seasonal_order"),
+            auto_order=body.get("auto_order", True),
+        )
+        _sync_results[job_id] = {"job_id": job_id, "status": "completed", "progress": 1.0, "result": result}
+    except Exception as e:
+        _sync_results[job_id] = {"job_id": job_id, "status": "failed", "error": str(e)}
+
+    return {"job_id": job_id, "status": "queued"}
 
 
 # ---------------------------------------------------------------------------
@@ -94,6 +147,15 @@ def get_job_status(
     _user: dict = Depends(get_current_user),
 ) -> dict[str, Any]:
     """Poll the status of a background job."""
+
+    # Check sync results first (fallback mode)
+    if job_id in _sync_results:
+        return _sync_results[job_id]
+
+    # Check Celery if available
+    if not _celery_available:
+        return {"job_id": job_id, "status": "failed", "error": "Job not found"}
+
     result = _get_celery().AsyncResult(job_id)
 
     if result.state == "PENDING":
@@ -137,8 +199,171 @@ def cancel_job(
     _user: dict = Depends(get_current_user),
 ) -> dict[str, Any]:
     """Cancel a running or queued job."""
-    _get_celery().control.revoke(job_id, terminate=True)
+    # Remove from sync results if present
+    if job_id in _sync_results:
+        del _sync_results[job_id]
+        return {"job_id": job_id, "cancelled": True}
+
+    if _celery_available:
+        _get_celery().control.revoke(job_id, terminate=True)
     return {"job_id": job_id, "cancelled": True}
+
+
+# ---------------------------------------------------------------------------
+# Synchronous training fallbacks (when Celery/Redis unavailable)
+# ---------------------------------------------------------------------------
+def _run_ml_training_sync(
+    dataset_id: str,
+    model_type: str,
+    horizons: list[int],
+    hyperparameters: dict[str, Any],
+    auto_tune: bool = False,
+    n_trials: int = 50,
+) -> dict[str, Any]:
+    """Run ML training synchronously (fallback when Celery unavailable)."""
+    import time
+    import numpy as np
+
+    model_id = str(uuid.uuid4())
+    start_time = time.perf_counter()
+
+    from api.services.dataset_store import DatasetStore
+    from app_core.services.modeling_service import ModelingService, ModelConfig
+
+    store = DatasetStore()
+    entry = store.get(dataset_id)
+
+    if entry.feature_names is None or entry.train_idx is None:
+        raise ValueError("Dataset not prepared. Run feature engineering first.")
+
+    svc = ModelingService()
+    all_metrics: dict[str, dict] = {}
+
+    for h in horizons:
+        target_col = f"Target_{h}"
+        if target_col not in entry.df.columns:
+            continue
+
+        y_all = entry.df[target_col].values
+        X_all = entry.df[entry.feature_names].values
+
+        X_train = X_all[entry.train_idx]
+        y_train = y_all[entry.train_idx]
+        X_test = X_all[entry.test_idx]
+        y_test = y_all[entry.test_idx]
+
+        X_cal = X_all[entry.cal_idx] if entry.cal_idx is not None else None
+        y_cal = y_all[entry.cal_idx] if entry.cal_idx is not None else None
+
+        config = ModelConfig(
+            model_type=model_type,
+            target_column=target_col,
+            horizons=[h],
+            hyperparameters=hyperparameters,
+            auto_tune=auto_tune,
+            n_trials=n_trials,
+        )
+
+        result = svc.train_model(X_train, y_train, X_test, y_test, config, X_cal, y_cal)
+
+        if result.success and result.data:
+            all_metrics[f"h{h}"] = result.data.metrics
+        else:
+            all_metrics[f"h{h}"] = {"error": result.error or "Training failed"}
+
+    # Aggregate metrics
+    valid_metrics = {k: v for k, v in all_metrics.items() if "error" not in v}
+    if valid_metrics:
+        avg_rmse = float(np.mean([m.get("rmse", 0) for m in valid_metrics.values()]))
+        avg_mae = float(np.mean([m.get("mae", 0) for m in valid_metrics.values()]))
+        avg_mape = float(np.mean([m.get("mape", 0) for m in valid_metrics.values()]))
+    else:
+        avg_rmse = avg_mae = avg_mape = 0.0
+
+    training_time = time.perf_counter() - start_time
+
+    return {
+        "status": "completed",
+        "model_id": model_id,
+        "model_type": model_type,
+        "model_name": f"{model_type} (multi-horizon)",
+        "metrics": {"rmse": round(avg_rmse, 4), "mae": round(avg_mae, 4), "mape": round(avg_mape, 4)},
+        "all_metrics": all_metrics,
+        "training_time": round(training_time, 2),
+    }
+
+
+def _run_baseline_training_sync(
+    dataset_id: str,
+    model_type: str,
+    order: list[int] | None = None,
+    seasonal_order: list[int] | None = None,
+    auto_order: bool = True,
+) -> dict[str, Any]:
+    """Run baseline (ARIMA/SARIMAX) training synchronously."""
+    import time
+    import numpy as np
+    from sklearn.metrics import mean_squared_error, mean_absolute_error
+
+    model_id = str(uuid.uuid4())
+    start_time = time.perf_counter()
+
+    from api.services.dataset_store import DatasetStore
+
+    store = DatasetStore()
+    entry = store.get(dataset_id)
+
+    # Find ED/target column
+    ed_col = None
+    for candidate in ["ED", "Total_Arrivals", "patient_count"]:
+        if candidate in entry.df.columns:
+            ed_col = candidate
+            break
+
+    if ed_col is None:
+        raise ValueError("No target column (ED) found in dataset")
+
+    y = entry.df[ed_col].dropna().values
+
+    if model_type == "arima":
+        from statsmodels.tsa.arima.model import ARIMA
+        if auto_order:
+            from pmdarima import auto_arima
+            auto_model = auto_arima(y, seasonal=False, stepwise=True, suppress_warnings=True)
+            fitted = auto_model
+            order_used = auto_model.order
+        else:
+            order_tuple = tuple(order) if order else (1, 1, 1)
+            model = ARIMA(y, order=order_tuple)
+            fitted = model.fit()
+            order_used = order_tuple
+    else:  # sarimax
+        from statsmodels.tsa.statespace.sarimax import SARIMAX
+        order_tuple = tuple(order) if order else (1, 1, 1)
+        seasonal_tuple = tuple(seasonal_order) if seasonal_order else (0, 0, 0, 7)
+        model = SARIMAX(y, order=order_tuple, seasonal_order=seasonal_tuple)
+        fitted = model.fit(disp=False)
+        order_used = order_tuple
+
+    y_pred = fitted.fittedvalues if hasattr(fitted, 'fittedvalues') else fitted.predict_in_sample()
+    min_len = min(len(y), len(y_pred))
+    y_true = y[-min_len:]
+    y_pred_aligned = np.array(y_pred[-min_len:])
+
+    rmse = float(np.sqrt(mean_squared_error(y_true, y_pred_aligned)))
+    mae = float(mean_absolute_error(y_true, y_pred_aligned))
+    mape = float(np.mean(np.abs((y_true - y_pred_aligned) / np.clip(y_true, 1, None))) * 100)
+
+    training_time = time.perf_counter() - start_time
+
+    return {
+        "status": "completed",
+        "model_id": model_id,
+        "model_type": model_type,
+        "model_name": f"{model_type.upper()} {order_used}",
+        "metrics": {"rmse": round(rmse, 4), "mae": round(mae, 4), "mape": round(mape, 4)},
+        "training_time": round(training_time, 2),
+    }
 
 
 # ---------------------------------------------------------------------------
