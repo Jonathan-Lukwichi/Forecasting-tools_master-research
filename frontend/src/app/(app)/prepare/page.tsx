@@ -46,11 +46,15 @@ import {
   type FuseResponse,
   type FeatureEngineeringResponse,
 } from "@/lib/api";
+import { usePipelineStore } from "@/stores/pipeline";
 import PageHeader from "@/components/ui/PageHeader";
 import FadeIn from "@/components/ui/FadeIn";
 
 export default function PreparePage() {
   const router = useRouter();
+
+  // Pipeline store
+  const { setFusedDataset, setProcessedDataset } = usePipelineStore();
 
   // Auth
   useEffect(() => {
@@ -112,6 +116,9 @@ export default function PreparePage() {
       });
       setFuseResult(result);
 
+      // Save to pipeline store
+      setFusedDataset(result.dataset_id, result.rows, result.columns);
+
       // Load preview
       const ds = await getDataset(result.dataset_id, 10);
       const data = ds as Record<string, unknown>;
@@ -143,6 +150,13 @@ export default function PreparePage() {
         cal_ratio: 0.15,
       });
       setFeResult(result);
+
+      // Save to pipeline store
+      setProcessedDataset(
+        result.dataset_id,
+        result.train_size + result.cal_size + result.test_size,
+        [...result.feature_names, ...result.target_names]
+      );
     } catch (err) {
       setFeError(err instanceof Error ? err.message : "Feature engineering failed");
     } finally {

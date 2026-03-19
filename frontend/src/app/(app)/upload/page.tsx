@@ -29,6 +29,7 @@ import {
   type SupabaseTableInfo,
   type SupabaseLoadResponse,
 } from "@/lib/api";
+import { usePipelineStore, type DatasetInfo as PipelineDatasetInfo } from "@/stores/pipeline";
 import PageHeader from "@/components/ui/PageHeader";
 import FadeIn from "@/components/ui/FadeIn";
 
@@ -46,6 +47,9 @@ export default function UploadPage() {
   const router = useRouter();
   const [user, setUser] = useState<UserInfo | null>(null);
   const [sourceTab, setSourceTab] = useState<SourceTab>("database");
+
+  // Pipeline store
+  const { setDataset } = usePipelineStore();
   const [selectedType, setSelectedType] = useState<DatasetType>("patient");
   const [dragOver, setDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -122,6 +126,20 @@ export default function UploadPage() {
       setDbResults(res.datasets);
       setDbErrors(res.errors);
 
+      // Save to pipeline store
+      for (const dataset of res.datasets) {
+        const dsType = dataset.dataset_type as PipelineDatasetInfo["type"];
+        if (["patient", "weather", "calendar", "reason"].includes(dsType)) {
+          setDataset(dsType, {
+            dataset_id: dataset.dataset_id,
+            type: dsType,
+            rows: dataset.rows,
+            columns: dataset.columns,
+            uploadedAt: new Date().toISOString(),
+          });
+        }
+      }
+
       // Refresh dataset list
       const ds = await listDatasets();
       setDatasets(ds);
@@ -130,7 +148,7 @@ export default function UploadPage() {
     } finally {
       setLoadingDb(false);
     }
-  }, [selectedTables]);
+  }, [selectedTables, setDataset]);
 
   // File upload handler
   const handleUpload = useCallback(
@@ -142,6 +160,16 @@ export default function UploadPage() {
       try {
         const result = await uploadDataset(file, selectedType);
         setUploadResult(result);
+
+        // Save to pipeline store for cross-page state
+        setDataset(selectedType, {
+          dataset_id: result.dataset_id,
+          type: selectedType,
+          rows: result.rows,
+          columns: result.columns,
+          uploadedAt: new Date().toISOString(),
+        });
+
         const ds = await listDatasets();
         setDatasets(ds);
       } catch (err) {
@@ -150,7 +178,7 @@ export default function UploadPage() {
         setUploading(false);
       }
     },
-    [selectedType]
+    [selectedType, setDataset]
   );
 
   // Drag & drop handlers

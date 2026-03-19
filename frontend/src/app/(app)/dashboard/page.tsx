@@ -1,6 +1,6 @@
 /**
  * Dashboard page — healthcare white theme.
- * Fetches data from FastAPI backend.
+ * Fetches data from FastAPI backend using Zustand pipeline store.
  */
 "use client";
 
@@ -18,6 +18,7 @@ import {
 } from "recharts";
 
 import { getMe, getDashboardKPIs, listDatasets, type DashboardKPIs, type UserInfo } from "@/lib/api";
+import { usePipelineStore, selectActiveDatasetId, selectPipelineProgress } from "@/stores/pipeline";
 import InfoTooltip from "@/components/ui/Tooltip";
 import FadeIn from "@/components/ui/FadeIn";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -92,18 +93,48 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [isDemo, setIsDemo] = useState(true);
 
+  // Get pipeline state from Zustand store
+  const pipelineState = usePipelineStore();
+  const activeDatasetId = selectActiveDatasetId(pipelineState);
+  const progress = selectPipelineProgress(pipelineState);
+
   useEffect(() => {
     async function load() {
       try {
         const me = await getMe();
         setUser(me);
 
-        // Try to load real data
-        const datasets = await listDatasets();
-        if (datasets.length > 0) {
-          const realKpis = await getDashboardKPIs(datasets[0].dataset_id);
-          setKpis(realKpis);
-          setIsDemo(false);
+        // Try to load real data from pipeline store first
+        if (activeDatasetId) {
+          try {
+            const realKpis = await getDashboardKPIs(activeDatasetId);
+            // Merge with pipeline state for flags
+            setKpis({
+              ...realKpis,
+              has_forecast: progress.forecast || realKpis.has_forecast,
+              has_historical: progress.upload || realKpis.has_historical,
+              has_models: progress.train || realKpis.has_models,
+              has_staff_plan: progress.staff || realKpis.has_staff_plan,
+              has_supply_plan: progress.supply || realKpis.has_supply_plan,
+            });
+            setIsDemo(false);
+          } catch {
+            // Dataset might not exist in backend anymore, try listDatasets
+            const datasets = await listDatasets();
+            if (datasets.length > 0) {
+              const realKpis = await getDashboardKPIs(datasets[0].dataset_id);
+              setKpis(realKpis);
+              setIsDemo(false);
+            }
+          }
+        } else {
+          // Fallback: Try to list datasets from backend
+          const datasets = await listDatasets();
+          if (datasets.length > 0) {
+            const realKpis = await getDashboardKPIs(datasets[0].dataset_id);
+            setKpis(realKpis);
+            setIsDemo(false);
+          }
         }
       } catch {
         router.push("/login");
@@ -113,7 +144,7 @@ export default function DashboardPage() {
       }
     }
     load();
-  }, [router]);
+  }, [router, activeDatasetId, progress]);
 
   if (loading) {
     return (
@@ -145,14 +176,34 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Status indicators */}
+        {/* Status indicators - uses both API response and pipeline store */}
         <StatusBar
           items={[
-            { label: "Historical", active: kpis.has_historical, detail: `${kpis.total_records} days` },
-            { label: "Forecast", active: kpis.has_forecast, detail: kpis.forecast_model_name },
-            { label: "Models", active: kpis.has_models, detail: `${kpis.models_trained} trained` },
-            { label: "Staff Plan", active: kpis.has_staff_plan },
-            { label: "Supply Plan", active: kpis.has_supply_plan },
+            {
+              label: "Historical",
+              active: progress.upload || kpis.has_historical,
+              detail: kpis.total_records > 0 ? `${kpis.total_records} days` : (progress.upload ? "Loaded" : undefined)
+            },
+            {
+              label: "Forecast",
+              active: progress.forecast || kpis.has_forecast,
+              detail: kpis.forecast_model_name !== "N/A" ? kpis.forecast_model_name : (pipelineState.activeForecast?.model || undefined)
+            },
+            {
+              label: "Models",
+              active: progress.train || kpis.has_models,
+              detail: kpis.models_trained > 0 ? `${kpis.models_trained} trained` : (Object.keys(pipelineState.modelResults).length > 0 ? `${Object.keys(pipelineState.modelResults).length} trained` : undefined)
+            },
+            {
+              label: "Staff Plan",
+              active: progress.staff || kpis.has_staff_plan,
+              detail: pipelineState.staffPlan ? `${pipelineState.staffPlan.coverage_pct}% coverage` : undefined
+            },
+            {
+              label: "Supply Plan",
+              active: progress.supply || kpis.has_supply_plan,
+              detail: pipelineState.supplyPlan ? `${pipelineState.supplyPlan.items_count} items` : undefined
+            },
           ]}
         />
 
