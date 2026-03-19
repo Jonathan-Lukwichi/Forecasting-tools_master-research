@@ -170,38 +170,46 @@ def train_baseline(
 # ---------------------------------------------------------------------------
 # Compare models
 # ---------------------------------------------------------------------------
-@router.get("/compare/{dataset_id}", response_model=ModelComparisonResponse)
+@router.get("/compare/{dataset_id}")
 def compare_models(
     dataset_id: str,
     metric: str = "rmse",
     _user: dict = Depends(get_current_user),
     store: DatasetStore = Depends(get_dataset_store),
-):
+) -> dict[str, Any]:
+    """Compare trained models for a dataset. Returns format expected by frontend."""
     try:
         entry = store.get(dataset_id)
     except KeyError:
         raise HTTPException(404, "Dataset not found")
 
     if not entry.model_results:
-        raise HTTPException(404, "No trained models found for this dataset")
+        # Return empty response instead of 404 - frontend handles empty state
+        return {
+            "models": [],
+            "best_model_id": "",
+            "ranking_metric": metric,
+        }
 
-    ranking = []
+    models = []
     for model_id, result in entry.model_results.items():
         metrics = result.get("metrics", {})
-        ranking.append({
+        models.append({
             "model_id": model_id,
-            "model": result.get("model_type", "unknown"),
-            "rmse": metrics.get("rmse", float("inf")),
-            "mae": metrics.get("mae", float("inf")),
-            "mape": metrics.get("mape", float("inf")),
+            "model_type": result.get("model_type", "unknown"),
+            "metrics": {
+                "rmse": metrics.get("rmse", 0),
+                "mae": metrics.get("mae", 0),
+                "mape": metrics.get("mape", 0),
+            },
+            "training_time": result.get("training_time", 0),
         })
 
-    ranking.sort(key=lambda x: x.get(metric, float("inf")))
-    for i, r in enumerate(ranking):
-        r["rank"] = i + 1
+    # Sort by the selected metric (lower is better)
+    models.sort(key=lambda x: x["metrics"].get(metric, float("inf")))
 
-    return ModelComparisonResponse(
-        best_model=ranking[0]["model"] if ranking else "none",
-        ranking=ranking,
-        metric_used=metric,
-    )
+    return {
+        "models": models,
+        "best_model_id": models[0]["model_id"] if models else "",
+        "ranking_metric": metric,
+    }

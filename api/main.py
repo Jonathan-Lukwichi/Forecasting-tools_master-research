@@ -14,7 +14,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.config import get_settings
-from api.routes import auth, data, models, forecast, kpi, optimization, jobs, supabase_data
+from api.routes import auth, data, models, forecast, kpi, optimization, jobs, supabase_data, ai
 
 settings = get_settings()
 
@@ -50,6 +50,7 @@ app.include_router(kpi.router, prefix=API_PREFIX)
 app.include_router(optimization.router, prefix=API_PREFIX)
 app.include_router(jobs.router, prefix=API_PREFIX)
 app.include_router(supabase_data.router, prefix=API_PREFIX)
+app.include_router(ai.router, prefix=API_PREFIX)
 
 # WebSocket router (no prefix — path defined in route)
 app.include_router(jobs.ws_router)
