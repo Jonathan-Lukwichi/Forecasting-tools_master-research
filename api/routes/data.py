@@ -132,8 +132,15 @@ def _find_datetime_col(df: pd.DataFrame) -> str | None:
 
 
 def _normalize_to_date(dt_series: pd.Series) -> pd.Series:
-    """Convert datetime to date-only (midnight) for daily aggregation."""
-    return pd.to_datetime(dt_series, errors="coerce").dt.normalize()
+    """Convert datetime to date-only (midnight) for daily aggregation.
+
+    Handles timezone-aware datetimes by converting to timezone-naive first.
+    """
+    dt = pd.to_datetime(dt_series, errors="coerce")
+    # Remove timezone info if present (convert to naive datetime)
+    if dt.dt.tz is not None:
+        dt = dt.dt.tz_localize(None)
+    return dt.dt.normalize()
 
 
 def _prep_for_fusion(df: pd.DataFrame, dataset_type: str) -> pd.DataFrame:
