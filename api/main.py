@@ -60,6 +60,17 @@ app.include_router(jobs.ws_router)
 # ---------------------------------------------------------------------------
 @app.get("/health", tags=["System"])
 def health_check():
+    # Simple health check for fast response (Render port detection)
+    return {
+        "status": "healthy",
+        "app": settings.app_name,
+        "version": settings.app_version,
+    }
+
+
+@app.get("/health/full", tags=["System"])
+def health_check_full():
+    # Full health check with Supabase status
     from api.services.supabase_service import is_connected as supabase_connected
 
     return {
