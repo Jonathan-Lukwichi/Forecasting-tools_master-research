@@ -277,7 +277,7 @@ def fuse_datasets(
 
 
 # ---------------------------------------------------------------------------
-# Feature Engineering
+# Feature Engineering — mirrors Streamlit logic
 # ---------------------------------------------------------------------------
 @router.post("/features/engineer", response_model=FeatureEngineeringResponse)
 def engineer_features(
@@ -285,59 +285,78 @@ def engineer_features(
     _user: dict = Depends(get_current_user),
     store: DatasetStore = Depends(get_dataset_store),
 ):
-    from app_core.services.data_service import DataService
-
     try:
         entry = store.get(body.dataset_id)
     except KeyError:
         raise HTTPException(404, "Dataset not found")
 
-    svc = DataService()
+    df = entry.df.copy()
 
-    # Generate lag features
-    lag_result = svc.generate_lag_features(
-        entry.df,
-        target_column="ED",
-        n_lags=body.n_lags,
-        n_horizons=body.n_horizons,
-    )
-    if not lag_result.success:
-        raise HTTPException(422, lag_result.error or "Lag feature generation failed")
+    # Verify ED column exists
+    if "ED" not in df.columns:
+        raise HTTPException(422, "Dataset must have 'ED' column for feature engineering")
 
-    processed_df = lag_result.data
+    # Verify Date column exists
+    if "Date" not in df.columns:
+        raise HTTPException(422, "Dataset must have 'Date' column for feature engineering")
+
+    # Ensure Date is timezone-naive and sorted
+    df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+    if df["Date"].dt.tz is not None:
+        df["Date"] = df["Date"].dt.tz_localize(None)
+    df = df.sort_values("Date").reset_index(drop=True)
+
+    # Generate lag features (ED_1, ED_2, ..., ED_n)
+    for i in range(1, body.n_lags + 1):
+        df[f"ED_{i}"] = df["ED"].shift(i)
+
+    # Generate target columns (Target_1, Target_2, ..., Target_n)
+    for i in range(1, body.n_horizons + 1):
+        df[f"Target_{i}"] = df["ED"].shift(-i)
+
+    # Only drop rows where lag/target columns have NaN (edges of the dataset)
+    lag_cols = [f"ED_{i}" for i in range(1, body.n_lags + 1)]
+    target_cols = [f"Target_{i}" for i in range(1, body.n_horizons + 1)]
+    required_cols = lag_cols + target_cols
+
+    df = df.dropna(subset=required_cols).reset_index(drop=True)
+
+    if df.empty:
+        raise HTTPException(422, "Feature engineering resulted in empty dataset")
 
     # Temporal split
-    split_result = svc.compute_temporal_split(
-        processed_df,
-        date_column="Date",
-        train_ratio=body.train_ratio,
-        cal_ratio=body.cal_ratio,
-    )
-    if not split_result.success:
-        raise HTTPException(422, split_result.error or "Temporal split failed")
+    n = len(df)
+    train_end = int(n * body.train_ratio)
+    cal_end = int(n * (body.train_ratio + body.cal_ratio))
 
-    split_info = split_result.data
+    train_idx = list(range(0, train_end))
+    cal_idx = list(range(train_end, cal_end))
+    test_idx = list(range(cal_end, n))
 
-    # Identify feature and target columns
-    target_cols = [c for c in processed_df.columns if c.startswith("Target_")]
-    exclude = {"Date", "datetime"} | set(target_cols)
-    feature_cols = [c for c in processed_df.columns if c not in exclude and processed_df[c].dtype in ("float64", "int64", "float32", "int32")]
+    # Identify feature columns (numeric, excluding Date and targets)
+    exclude_cols = {"Date", "datetime", "date", "id", "created_at"} | set(target_cols)
+    feature_cols = [
+        c for c in df.columns
+        if c not in exclude_cols
+        and not c.startswith("Target_")
+        and pd.api.types.is_numeric_dtype(df[c])
+    ]
 
-    # Store artifacts on the entry
-    entry.df = processed_df
+    # Update entry with processed data
+    entry.df = df
     entry.feature_names = feature_cols
     entry.target_names = target_cols
-    entry.train_idx = split_info.get("train_idx")
-    entry.cal_idx = split_info.get("cal_idx")
-    entry.test_idx = split_info.get("test_idx")
+    entry.train_idx = train_idx
+    entry.cal_idx = cal_idx
+    entry.test_idx = test_idx
 
     return FeatureEngineeringResponse(
         dataset_id=body.dataset_id,
         feature_names=feature_cols,
         target_names=target_cols,
-        train_size=len(split_info.get("train_idx", [])),
-        cal_size=len(split_info.get("cal_idx", [])),
-        test_size=len(split_info.get("test_idx", [])),
+        train_size=len(train_idx),
+        cal_size=len(cal_idx),
+        test_size=len(test_idx),
         total_features=len(feature_cols),
     )
 
