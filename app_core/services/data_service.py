@@ -137,17 +137,17 @@ class DataService(BaseService):
     def fuse_datasets(
         self,
         patient_df: pd.DataFrame,
-        weather_df: pd.DataFrame,
-        calendar_df: pd.DataFrame,
+        weather_df: Optional[pd.DataFrame] = None,
+        calendar_df: Optional[pd.DataFrame] = None,
         reason_df: Optional[pd.DataFrame] = None,
     ) -> ServiceResult:
         """
         Fuse multiple datasets on datetime keys.
 
         Args:
-            patient_df: Patient arrivals data
-            weather_df: Weather data
-            calendar_df: Calendar/holiday data
+            patient_df: Patient arrivals data (required)
+            weather_df: Weather data (optional)
+            calendar_df: Calendar/holiday data (optional)
             reason_df: Optional reason for visit data
 
         Returns:
@@ -156,12 +156,12 @@ class DataService(BaseService):
         def _fuse():
             self._update_progress(10, "Detecting datetime columns...")
 
-            # Detect datetime columns in each dataset
-            dfs = [
-                ('patient', patient_df),
-                ('weather', weather_df),
-                ('calendar', calendar_df),
-            ]
+            # Detect datetime columns in each dataset (patient is required, others optional)
+            dfs = [('patient', patient_df)]
+            if weather_df is not None:
+                dfs.append(('weather', weather_df))
+            if calendar_df is not None:
+                dfs.append(('calendar', calendar_df))
             if reason_df is not None:
                 dfs.append(('reason', reason_df))
 

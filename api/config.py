@@ -35,8 +35,10 @@ class Settings(BaseSettings):
         "http://localhost:3001",
         "https://healthforecast-ai.vercel.app",
         "https://healthforecast-app.vercel.app",
+        "https://healthforecast-frontend.vercel.app",
         "https://healthforecast-app-git-main-jonathan-lukwichis-projects.vercel.app",
         "https://healthforecast-rj4zs0e38-jonathan-lukwichis-projects.vercel.app",
+        "https://healthforecast-frontend-git-main-jonathan-lukwichis-projects.vercel.app",
     ]
 
     # File uploads
