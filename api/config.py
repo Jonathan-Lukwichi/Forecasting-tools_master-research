@@ -29,15 +29,14 @@ class Settings(BaseSettings):
     llm_provider: str = "anthropic"
     llm_api_key: str = ""
 
-    # CORS
+    # CORS - Allow all Vercel preview and production domains
     cors_origins: list[str] = [
         "http://localhost:3000",
         "http://localhost:3001",
         "https://healthforecast-ai.vercel.app",
         "https://healthforecast-app.vercel.app",
-        "https://hf-ai-frontend.vercel.app",
-        "https://healthforecast-v2.vercel.app",
         "https://healthforecast-app-git-main-jonathan-lukwichis-projects.vercel.app",
+        "https://healthforecast-rj4zs0e38-jonathan-lukwichis-projects.vercel.app",
     ]
 
     # File uploads
