@@ -13,6 +13,8 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query
 
 from api.dependencies import get_current_user, get_dataset_store
 from api.schemas.data import (
+    ACFPACFResult,
+    ADFTestResult,
     ColumnSummary,
     EDARequest,
     EDAResponse,
@@ -22,9 +24,11 @@ from api.schemas.data import (
     FuseResponse,
     FeatureEngineeringRequest,
     FeatureEngineeringResponse,
+    SeasonalDecompResult,
     UploadResponse,
     ValidateRequest,
     ValidateResponse,
+    WeatherBinResult,
 )
 from api.services.dataset_store import DatasetStore
 from api.services.supabase_service import (
@@ -595,6 +599,135 @@ def explore_dataset(
         except Exception:
             pass
 
+    # =========================================================================
+    # Advanced Time Series Analytics (mirrors Streamlit EDA)
+    # =========================================================================
+
+    # Full correlation matrix
+    correlation_matrix: dict[str, dict[str, float]] | None = None
+    if len(numeric_cols) >= 2:
+        try:
+            corr_df = df[numeric_cols].corr(method="spearman")
+            correlation_matrix = {
+                col: {c: round(float(v), 4) for c, v in row.items()}
+                for col, row in corr_df.to_dict().items()
+            }
+        except Exception:
+            pass
+
+    # ACF/PACF for target column
+    acf_pacf_result: ACFPACFResult | None = None
+    if target in df.columns and pd.api.types.is_numeric_dtype(df[target]):
+        try:
+            from statsmodels.tsa.stattools import acf as sm_acf, pacf as sm_pacf
+
+            y = df[target].dropna().values
+            if len(y) >= 20:
+                nlags = min(40, len(y) // 2 - 1)
+                acf_vals, confint_acf = sm_acf(y, nlags=nlags, alpha=0.05, fft=True)
+                pacf_vals, confint_pacf = sm_pacf(y, nlags=nlags, method="ywm", alpha=0.05)
+
+                acf_pacf_result = ACFPACFResult(
+                    acf_values=[round(float(v), 4) for v in acf_vals],
+                    pacf_values=[round(float(v), 4) for v in pacf_vals],
+                    acf_conf_upper=[round(float(v), 4) for v in confint_acf[:, 1]],
+                    acf_conf_lower=[round(float(v), 4) for v in confint_acf[:, 0]],
+                    pacf_conf_upper=[round(float(v), 4) for v in confint_pacf[:, 1]],
+                    pacf_conf_lower=[round(float(v), 4) for v in confint_pacf[:, 0]],
+                    nlags=nlags,
+                )
+        except Exception:
+            pass
+
+    # ADF Stationarity Test
+    adf_result: ADFTestResult | None = None
+    if target in df.columns and pd.api.types.is_numeric_dtype(df[target]):
+        try:
+            from statsmodels.tsa.stattools import adfuller
+
+            y = df[target].dropna().values
+            if len(y) >= 20:
+                result = adfuller(y)
+                adf_result = ADFTestResult(
+                    adf_statistic=round(float(result[0]), 4),
+                    p_value=round(float(result[1]), 6),
+                    used_lag=int(result[2]),
+                    n_obs=int(result[3]),
+                    critical_values={k: round(float(v), 4) for k, v in result[4].items()},
+                    is_stationary=result[1] < 0.05,
+                )
+        except Exception:
+            pass
+
+    # Seasonal Decomposition
+    seasonal_result: SeasonalDecompResult | None = None
+    if date_col and target in df.columns:
+        try:
+            from statsmodels.tsa.seasonal import seasonal_decompose
+
+            temp_df = df[[date_col, target]].copy()
+            temp_df[date_col] = pd.to_datetime(temp_df[date_col], errors="coerce")
+            temp_df = temp_df.dropna().sort_values(date_col).set_index(date_col)
+
+            # Daily data → period=7 (weekly seasonality)
+            period = 7
+            if len(temp_df) >= 2 * period + 1:
+                result = seasonal_decompose(
+                    temp_df[target], model="additive", period=period, extrapolate_trend="freq"
+                )
+                dates = [d.strftime("%Y-%m-%d") for d in result.observed.index]
+                seasonal_result = SeasonalDecompResult(
+                    dates=dates,
+                    observed=[round(float(v), 2) if pd.notna(v) else None for v in result.observed],
+                    trend=[round(float(v), 2) if pd.notna(v) else None for v in result.trend],
+                    seasonal=[round(float(v), 2) if pd.notna(v) else None for v in result.seasonal],
+                    residual=[round(float(v), 2) if pd.notna(v) else None for v in result.resid],
+                    period=period,
+                    model="additive",
+                )
+        except Exception:
+            pass
+
+    # Weather Binning (temperature, wind, precipitation vs arrivals)
+    weather_bins: dict[str, WeatherBinResult] | None = None
+    weather_cols_map = {
+        "temperature": ["Average_Temp", "average_temp", "temp"],
+        "wind": ["Average_wind", "average_wind", "wind"],
+        "precipitation": ["Total_precipitation", "total_precipitation", "precip"],
+    }
+
+    if target in df.columns:
+        weather_bins = {}
+        for weather_type, possible_cols in weather_cols_map.items():
+            weather_col = None
+            for col in possible_cols:
+                if col in df.columns:
+                    weather_col = col
+                    break
+
+            if weather_col:
+                try:
+                    temp_data = df[[weather_col, target]].dropna()
+                    if len(temp_data) >= 10:
+                        n_bins = 12
+                        temp_data["bin"] = pd.cut(temp_data[weather_col], bins=n_bins)
+                        agg = temp_data.groupby("bin", observed=True).agg({
+                            weather_col: "mean",
+                            target: "mean"
+                        }).dropna()
+
+                        if len(agg) > 0:
+                            weather_bins[weather_type] = WeatherBinResult(
+                                bin_midpoints=[round(float(v), 2) for v in agg[weather_col]],
+                                avg_arrivals=[round(float(v), 2) for v in agg[target]],
+                                bin_labels=[str(idx) for idx in agg.index],
+                            )
+                except Exception:
+                    pass
+
+        if not weather_bins:
+            weather_bins = None
+
     return EDAResponse(
         dataset_id=body.dataset_id,
         rows=len(df),
@@ -607,6 +740,12 @@ def explore_dataset(
         monthly_averages=monthly_averages,
         numeric_columns=numeric_cols,
         date_column=date_col,
+        # Advanced analytics
+        correlation_matrix=correlation_matrix,
+        acf_pacf=acf_pacf_result,
+        adf_test=adf_result,
+        seasonal_decomposition=seasonal_result,
+        weather_bins=weather_bins,
     )
 
 

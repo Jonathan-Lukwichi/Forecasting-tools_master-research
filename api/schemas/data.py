@@ -122,6 +122,45 @@ class ColumnSummary(BaseModel):
     max: float | None = None
 
 
+class ACFPACFResult(BaseModel):
+    """ACF and PACF values for time series analysis."""
+    acf_values: list[float]
+    pacf_values: list[float]
+    acf_conf_upper: list[float]
+    acf_conf_lower: list[float]
+    pacf_conf_upper: list[float]
+    pacf_conf_lower: list[float]
+    nlags: int
+
+
+class ADFTestResult(BaseModel):
+    """Augmented Dickey-Fuller stationarity test results."""
+    adf_statistic: float
+    p_value: float
+    used_lag: int
+    n_obs: int
+    critical_values: dict[str, float]  # "1%", "5%", "10%" → value
+    is_stationary: bool  # True if p_value < 0.05
+
+
+class SeasonalDecompResult(BaseModel):
+    """Seasonal decomposition results (trend, seasonal, residual)."""
+    dates: list[str]
+    observed: list[float | None]
+    trend: list[float | None]
+    seasonal: list[float | None]
+    residual: list[float | None]
+    period: int
+    model: str  # "additive" or "multiplicative"
+
+
+class WeatherBinResult(BaseModel):
+    """Binned weather data for visualization."""
+    bin_midpoints: list[float]
+    avg_arrivals: list[float]
+    bin_labels: list[str]
+
+
 class EDAResponse(BaseModel):
     dataset_id: str
     rows: int
@@ -134,6 +173,12 @@ class EDAResponse(BaseModel):
     monthly_averages: dict[str, float]  # Jan→Dec average
     numeric_columns: list[str]
     date_column: str | None = None
+    # Advanced time series analytics
+    correlation_matrix: dict[str, dict[str, float]] | None = None  # full correlation matrix
+    acf_pacf: ACFPACFResult | None = None
+    adf_test: ADFTestResult | None = None
+    seasonal_decomposition: SeasonalDecompResult | None = None
+    weather_bins: dict[str, WeatherBinResult] | None = None  # temp, wind, precip
 
 
 # ---------------------------------------------------------------------------
