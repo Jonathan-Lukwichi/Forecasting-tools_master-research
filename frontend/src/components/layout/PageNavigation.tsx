@@ -9,6 +9,7 @@ const PAGE_ORDER = [
   { href: "/upload", label: "Upload Data" },
   { href: "/prepare", label: "Prepare Data" },
   { href: "/explore", label: "Explore Data" },
+  { href: "/selection", label: "Feature Selection" },
   { href: "/train", label: "Train Models" },
   { href: "/results", label: "Model Results" },
   { href: "/forecast", label: "Forecast" },

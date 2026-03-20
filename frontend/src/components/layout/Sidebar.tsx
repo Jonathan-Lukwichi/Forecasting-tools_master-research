@@ -9,6 +9,7 @@ import {
   Upload,
   Layers,
   BarChart3,
+  Filter,
   Cpu,
   Trophy,
   TrendingUp,
@@ -28,12 +29,13 @@ const NAV_ITEMS = [
   { href: "/upload", label: "Upload Data", icon: Upload, step: 1 },
   { href: "/prepare", label: "Prepare Data", icon: Layers, step: 2 },
   { href: "/explore", label: "Explore Data", icon: BarChart3, step: 3 },
-  { href: "/train", label: "Train Models", icon: Cpu, step: 4 },
-  { href: "/results", label: "Model Results", icon: Trophy, step: 5 },
-  { href: "/forecast", label: "Forecast", icon: TrendingUp, step: 6 },
-  { href: "/staff", label: "Staff Planner", icon: Users, step: 7 },
-  { href: "/supply", label: "Supply Planner", icon: Package, step: 8 },
-  { href: "/actions", label: "Action Center", icon: Zap, step: 9 },
+  { href: "/selection", label: "Feature Selection", icon: Filter, step: 4 },
+  { href: "/train", label: "Train Models", icon: Cpu, step: 5 },
+  { href: "/results", label: "Model Results", icon: Trophy, step: 6 },
+  { href: "/forecast", label: "Forecast", icon: TrendingUp, step: 7 },
+  { href: "/staff", label: "Staff Planner", icon: Users, step: 8 },
+  { href: "/supply", label: "Supply Planner", icon: Package, step: 9 },
+  { href: "/actions", label: "Action Center", icon: Zap, step: 10 },
 ];
 
 export default function Sidebar() {

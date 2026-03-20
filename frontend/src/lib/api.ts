@@ -565,6 +565,47 @@ export async function getRecommendations(
 }
 
 // ---------------------------------------------------------------------------
+// Feature Selection
+// ---------------------------------------------------------------------------
+export interface FeatureSelectionRequest {
+  dataset_id: string;
+  target_column?: string;
+  method?: string; // "correlation" | "permutation" | "lasso" | "gradient_boosting" | "all"
+  top_k?: number;
+  test_size?: number;
+}
+
+export interface FeatureImportance {
+  feature: string;
+  importance: number;
+  rank: number;
+}
+
+export interface FeatureSelectionResult {
+  method: string;
+  selected_features: string[];
+  importances: FeatureImportance[];
+  metrics: Record<string, number>;
+  elapsed_time: number;
+}
+
+export interface FeatureSelectionResponse {
+  dataset_id: string;
+  target_column: string;
+  total_features: number;
+  results: FeatureSelectionResult[];
+}
+
+export async function selectFeatures(
+  body: FeatureSelectionRequest
+): Promise<FeatureSelectionResponse> {
+  return apiFetch<FeatureSelectionResponse>("/api/features/select", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Supabase Data Loading
 // ---------------------------------------------------------------------------
 export interface SupabaseTableInfo {

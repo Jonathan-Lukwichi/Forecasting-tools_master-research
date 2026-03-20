@@ -10,6 +10,7 @@ const PAGE_BACKGROUNDS: Record<string, string> = {
   "/upload": "/images/login-bg3.jpg",
   "/prepare": "/images/prepare-bg.jpg",
   "/explore": "/images/explore-bg.jpg",
+  "/selection": "/images/explore-bg.jpg",
   "/train": "/images/train-bg.jpg",
   "/results": "/images/results-bg.jpg",
   "/forecast": "/images/forecast-bg2.jpg",
