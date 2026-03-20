@@ -6,9 +6,12 @@ Provides multiple feature selection methods:
 - Permutation importance
 - Lasso regularization
 - Gradient Boosting importance
+
+Memory-optimized for Render free tier (512MB limit).
 """
 from __future__ import annotations
 
+import gc
 import time
 from typing import Any
 
@@ -110,6 +113,8 @@ def select_features(
                 metrics={"error": 1.0},
                 elapsed_time=0.0,
             ))
+        # Memory cleanup after each method
+        gc.collect()
 
     return FeatureSelectionResponse(
         dataset_id=body.dataset_id,
@@ -166,9 +171,9 @@ def _run_feature_selection(
     sorted_features = sorted(importances.items(), key=lambda x: abs(x[1]), reverse=True)
     selected = [f for f, _ in sorted_features[:top_k]]
 
-    # Calculate metrics using selected features
+    # Calculate metrics using selected features (memory-optimized)
     from sklearn.ensemble import GradientBoostingRegressor
-    model = GradientBoostingRegressor(n_estimators=50, max_depth=3, random_state=42)
+    model = GradientBoostingRegressor(n_estimators=30, max_depth=3, random_state=42)
     model.fit(X_train_scaled[selected], y_train)
 
     y_train_pred = model.predict(X_train_scaled[selected])
@@ -179,6 +184,9 @@ def _run_feature_selection(
     mae_test = float(mean_absolute_error(y_test, y_test_pred))
 
     elapsed = time.perf_counter() - t0
+
+    # Memory cleanup
+    del model, X_train_scaled, X_test_scaled, y_train_pred, y_test_pred
 
     return FeatureSelectionResult(
         method=method,
@@ -211,16 +219,21 @@ def _permutation_importance(
     y_train: pd.Series,
     y_test: pd.Series,
 ) -> dict[str, float]:
-    """Permutation-based feature importance."""
+    """Permutation-based feature importance (memory-optimized)."""
     from sklearn.ensemble import RandomForestRegressor
     from sklearn.inspection import permutation_importance as sklearn_perm_importance
 
-    model = RandomForestRegressor(n_estimators=50, max_depth=5, random_state=42, n_jobs=-1)
+    # Reduced estimators and n_jobs=1 to save memory
+    model = RandomForestRegressor(n_estimators=30, max_depth=4, random_state=42, n_jobs=1)
     model.fit(X_train, y_train)
 
-    result = sklearn_perm_importance(model, X_test, y_test, n_repeats=5, random_state=42, n_jobs=-1)
+    result = sklearn_perm_importance(model, X_test, y_test, n_repeats=3, random_state=42, n_jobs=1)
+    importances = {col: float(imp) for col, imp in zip(X_train.columns, result.importances_mean)}
 
-    return {col: float(imp) for col, imp in zip(X_train.columns, result.importances_mean)}
+    del model, result
+    gc.collect()
+
+    return importances
 
 
 def _lasso_importance(X: pd.DataFrame, y: pd.Series) -> dict[str, float]:
@@ -234,10 +247,16 @@ def _lasso_importance(X: pd.DataFrame, y: pd.Series) -> dict[str, float]:
 
 
 def _gradient_boosting_importance(X: pd.DataFrame, y: pd.Series) -> dict[str, float]:
-    """Gradient Boosting feature importance."""
+    """Gradient Boosting feature importance (memory-optimized)."""
     from sklearn.ensemble import GradientBoostingRegressor
 
-    model = GradientBoostingRegressor(n_estimators=100, max_depth=4, random_state=42)
+    # Reduced estimators to save memory
+    model = GradientBoostingRegressor(n_estimators=50, max_depth=3, random_state=42)
     model.fit(X, y)
 
-    return {col: float(imp) for col, imp in zip(X.columns, model.feature_importances_)}
+    importances = {col: float(imp) for col, imp in zip(X.columns, model.feature_importances_)}
+
+    del model
+    gc.collect()
+
+    return importances

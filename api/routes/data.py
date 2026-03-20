@@ -601,21 +601,26 @@ def explore_dataset(
 
     # =========================================================================
     # Advanced Time Series Analytics (mirrors Streamlit EDA)
+    # Memory-optimized for Render free tier (512MB limit)
     # =========================================================================
+    import gc
 
-    # Full correlation matrix
+    # Full correlation matrix (limit to top 20 numeric cols to save memory)
     correlation_matrix: dict[str, dict[str, float]] | None = None
     if len(numeric_cols) >= 2:
         try:
-            corr_df = df[numeric_cols].corr(method="spearman")
+            # Limit columns to reduce memory
+            cols_to_use = numeric_cols[:20] if len(numeric_cols) > 20 else numeric_cols
+            corr_df = df[cols_to_use].corr(method="spearman")
             correlation_matrix = {
                 col: {c: round(float(v), 4) for c, v in row.items()}
                 for col, row in corr_df.to_dict().items()
             }
+            del corr_df
         except Exception:
             pass
 
-    # ACF/PACF for target column
+    # ACF/PACF for target column (reduced lags for memory efficiency)
     acf_pacf_result: ACFPACFResult | None = None
     if target in df.columns and pd.api.types.is_numeric_dtype(df[target]):
         try:
@@ -623,7 +628,8 @@ def explore_dataset(
 
             y = df[target].dropna().values
             if len(y) >= 20:
-                nlags = min(40, len(y) // 2 - 1)
+                # Reduced max lags from 40 to 21 to save memory
+                nlags = min(21, len(y) // 2 - 1)
                 acf_vals, confint_acf = sm_acf(y, nlags=nlags, alpha=0.05, fft=True)
                 pacf_vals, confint_pacf = sm_pacf(y, nlags=nlags, method="ywm", alpha=0.05)
 
@@ -636,8 +642,10 @@ def explore_dataset(
                     pacf_conf_lower=[round(float(v), 4) for v in confint_pacf[:, 0]],
                     nlags=nlags,
                 )
+                del y, acf_vals, pacf_vals, confint_acf, confint_pacf
         except Exception:
             pass
+        gc.collect()
 
     # ADF Stationarity Test
     adf_result: ADFTestResult | None = None
@@ -659,7 +667,7 @@ def explore_dataset(
         except Exception:
             pass
 
-    # Seasonal Decomposition
+    # Seasonal Decomposition (limit data size for memory efficiency)
     seasonal_result: SeasonalDecompResult | None = None
     if date_col and target in df.columns:
         try:
@@ -668,6 +676,10 @@ def explore_dataset(
             temp_df = df[[date_col, target]].copy()
             temp_df[date_col] = pd.to_datetime(temp_df[date_col], errors="coerce")
             temp_df = temp_df.dropna().sort_values(date_col).set_index(date_col)
+
+            # Limit to last 365 days to reduce memory usage
+            if len(temp_df) > 365:
+                temp_df = temp_df.tail(365)
 
             # Daily data → period=7 (weekly seasonality)
             period = 7
@@ -685,8 +697,11 @@ def explore_dataset(
                     period=period,
                     model="additive",
                 )
+                del result
+            del temp_df
         except Exception:
             pass
+        gc.collect()
 
     # Weather Binning (temperature, wind, precipitation vs arrivals)
     weather_bins: dict[str, WeatherBinResult] | None = None
@@ -727,6 +742,9 @@ def explore_dataset(
 
         if not weather_bins:
             weather_bins = None
+
+    # Final memory cleanup
+    gc.collect()
 
     return EDAResponse(
         dataset_id=body.dataset_id,

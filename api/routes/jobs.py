@@ -41,15 +41,25 @@ router = APIRouter(prefix="/jobs", tags=["Jobs"])
 # In-memory store for synchronous job results (fallback when Celery unavailable)
 _sync_results: dict[str, dict[str, Any]] = {}
 
-# Check if Celery/Redis is available
+# Lazy check for Celery/Redis availability (don't run at import time to save memory)
+_celery_checked = False
 _celery_available = False
-try:
-    from api.workers.celery_app import celery_app
-    # Try to ping Redis
-    celery_app.control.ping(timeout=1)
-    _celery_available = True
-except Exception:
-    _celery_available = False
+
+
+def _check_celery_availability() -> bool:
+    """Lazy check for Celery/Redis availability."""
+    global _celery_checked, _celery_available
+    if _celery_checked:
+        return _celery_available
+    _celery_checked = True
+    try:
+        from api.workers.celery_app import celery_app
+        # Try to ping Redis with short timeout
+        result = celery_app.control.ping(timeout=0.5)
+        _celery_available = bool(result)
+    except Exception:
+        _celery_available = False
+    return _celery_available
 
 
 def _get_celery():
@@ -68,7 +78,7 @@ def submit_training_job(
 ) -> dict[str, str]:
     """Submit an ML training job. Uses Celery if available, else runs synchronously."""
 
-    if _celery_available:
+    if _check_celery_availability():
         # Async mode: submit to Celery queue
         from api.workers.training_tasks import train_ml_model
         task = train_ml_model.delay(
@@ -108,7 +118,7 @@ def submit_baseline_job(
 ) -> dict[str, str]:
     """Submit a baseline model training job. Uses Celery if available, else runs synchronously."""
 
-    if _celery_available:
+    if _check_celery_availability():
         from api.workers.training_tasks import train_baseline_model
         task = train_baseline_model.delay(
             dataset_id=body["dataset_id"],
@@ -153,7 +163,7 @@ def get_job_status(
         return _sync_results[job_id]
 
     # Check Celery if available
-    if not _celery_available:
+    if not _check_celery_availability():
         return {"job_id": job_id, "status": "failed", "error": "Job not found"}
 
     result = _get_celery().AsyncResult(job_id)
@@ -204,7 +214,7 @@ def cancel_job(
         del _sync_results[job_id]
         return {"job_id": job_id, "cancelled": True}
 
-    if _celery_available:
+    if _check_celery_availability():
         _get_celery().control.revoke(job_id, terminate=True)
     return {"job_id": job_id, "cancelled": True}
 
