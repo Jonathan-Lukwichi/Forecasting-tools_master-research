@@ -232,54 +232,77 @@ def _run_ml_training_sync(
 ) -> dict[str, Any]:
     """Run ML training synchronously (fallback when Celery unavailable)."""
     import time
+    import gc
     import numpy as np
+    import pandas as pd
+    from sklearn.metrics import mean_squared_error, mean_absolute_error
 
     model_id = str(uuid.uuid4())
     start_time = time.perf_counter()
 
     from api.services.dataset_store import DatasetStore
-    from app_core.services.modeling_service import ModelingService, ModelConfig
 
     store = DatasetStore()
     entry = store.get(dataset_id)
 
+    # Check if feature engineering was done
     if entry.feature_names is None or entry.train_idx is None:
         raise ValueError("Dataset not prepared. Run feature engineering first.")
 
-    svc = ModelingService()
     all_metrics: dict[str, dict] = {}
 
+    # Train model for each horizon using sklearn directly (memory efficient)
     for h in horizons:
         target_col = f"Target_{h}"
         if target_col not in entry.df.columns:
             continue
 
-        y_all = entry.df[target_col].values
-        X_all = entry.df[entry.feature_names].values
+        try:
+            # Get feature and target data as DataFrames/Series
+            X = entry.df[entry.feature_names]
+            y = entry.df[target_col]
 
-        X_train = X_all[entry.train_idx]
-        y_train = y_all[entry.train_idx]
-        X_test = X_all[entry.test_idx]
-        y_test = y_all[entry.test_idx]
+            X_train = X.iloc[entry.train_idx]
+            y_train = y.iloc[entry.train_idx]
+            X_test = X.iloc[entry.test_idx]
+            y_test = y.iloc[entry.test_idx]
 
-        X_cal = X_all[entry.cal_idx] if entry.cal_idx is not None else None
-        y_cal = y_all[entry.cal_idx] if entry.cal_idx is not None else None
+            if model_type == "xgboost":
+                from sklearn.ensemble import GradientBoostingRegressor
+                # Use sklearn's GradientBoosting as lightweight XGBoost alternative
+                model = GradientBoostingRegressor(
+                    n_estimators=hyperparameters.get("n_estimators", 100),
+                    max_depth=hyperparameters.get("max_depth", 4),
+                    learning_rate=hyperparameters.get("learning_rate", 0.1),
+                    random_state=42,
+                )
+            elif model_type == "random_forest":
+                from sklearn.ensemble import RandomForestRegressor
+                model = RandomForestRegressor(
+                    n_estimators=hyperparameters.get("n_estimators", 100),
+                    max_depth=hyperparameters.get("max_depth", 10),
+                    random_state=42,
+                    n_jobs=1,
+                )
+            else:
+                # Default to GradientBoosting for other types
+                from sklearn.ensemble import GradientBoostingRegressor
+                model = GradientBoostingRegressor(n_estimators=50, max_depth=3, random_state=42)
 
-        config = ModelConfig(
-            model_type=model_type,
-            target_column=target_col,
-            horizons=[h],
-            hyperparameters=hyperparameters,
-            auto_tune=auto_tune,
-            n_trials=n_trials,
-        )
+            model.fit(X_train, y_train)
+            predictions = model.predict(X_test)
 
-        result = svc.train_model(X_train, y_train, X_test, y_test, config, X_cal, y_cal)
+            rmse = float(np.sqrt(mean_squared_error(y_test, predictions)))
+            mae = float(mean_absolute_error(y_test, predictions))
+            mape = float(np.mean(np.abs((y_test - predictions) / np.clip(y_test, 1, None))) * 100)
 
-        if result.success and result.data:
-            all_metrics[f"h{h}"] = result.data.metrics
-        else:
-            all_metrics[f"h{h}"] = {"error": result.error or "Training failed"}
+            all_metrics[f"h{h}"] = {"rmse": rmse, "mae": mae, "mape": mape}
+
+            del model, predictions
+            gc.collect()
+
+        except Exception as e:
+            all_metrics[f"h{h}"] = {"error": str(e)}
 
     # Aggregate metrics
     valid_metrics = {k: v for k, v in all_metrics.items() if "error" not in v}
@@ -312,6 +335,7 @@ def _run_baseline_training_sync(
 ) -> dict[str, Any]:
     """Run baseline (ARIMA/SARIMAX) training synchronously."""
     import time
+    import gc
     import numpy as np
     from sklearn.metrics import mean_squared_error, mean_absolute_error
 
@@ -325,55 +349,74 @@ def _run_baseline_training_sync(
 
     # Find ED/target column
     ed_col = None
-    for candidate in ["ED", "Total_Arrivals", "patient_count"]:
+    for candidate in ["ED", "Total_Arrivals", "patient_count", "Target_1"]:
         if candidate in entry.df.columns:
             ed_col = candidate
             break
 
     if ed_col is None:
-        raise ValueError("No target column (ED) found in dataset")
+        raise ValueError("No target column (ED) found in dataset. Available columns: " + ", ".join(entry.df.columns[:10].tolist()))
 
     y = entry.df[ed_col].dropna().values
 
-    if model_type == "arima":
-        from statsmodels.tsa.arima.model import ARIMA
-        if auto_order:
-            from pmdarima import auto_arima
-            auto_model = auto_arima(y, seasonal=False, stepwise=True, suppress_warnings=True)
-            fitted = auto_model
-            order_used = auto_model.order
-        else:
+    # Limit data size for memory efficiency
+    if len(y) > 1000:
+        y = y[-1000:]
+
+    try:
+        if model_type == "arima":
+            if auto_order:
+                from pmdarima import auto_arima
+                auto_model = auto_arima(
+                    y,
+                    seasonal=False,
+                    stepwise=True,
+                    suppress_warnings=True,
+                    max_p=3, max_q=3, max_d=2,  # Limit search space
+                    n_jobs=1,
+                )
+                fitted = auto_model
+                order_used = auto_model.order
+            else:
+                from statsmodels.tsa.arima.model import ARIMA
+                order_tuple = tuple(order) if order else (1, 1, 1)
+                model = ARIMA(y, order=order_tuple)
+                fitted = model.fit()
+                order_used = order_tuple
+        else:  # sarimax
+            from statsmodels.tsa.statespace.sarimax import SARIMAX
             order_tuple = tuple(order) if order else (1, 1, 1)
-            model = ARIMA(y, order=order_tuple)
-            fitted = model.fit()
+            seasonal_tuple = tuple(seasonal_order) if seasonal_order else (1, 0, 1, 7)
+            model = SARIMAX(y, order=order_tuple, seasonal_order=seasonal_tuple)
+            fitted = model.fit(disp=False, maxiter=100)
             order_used = order_tuple
-    else:  # sarimax
-        from statsmodels.tsa.statespace.sarimax import SARIMAX
-        order_tuple = tuple(order) if order else (1, 1, 1)
-        seasonal_tuple = tuple(seasonal_order) if seasonal_order else (0, 0, 0, 7)
-        model = SARIMAX(y, order=order_tuple, seasonal_order=seasonal_tuple)
-        fitted = model.fit(disp=False)
-        order_used = order_tuple
 
-    y_pred = fitted.fittedvalues if hasattr(fitted, 'fittedvalues') else fitted.predict_in_sample()
-    min_len = min(len(y), len(y_pred))
-    y_true = y[-min_len:]
-    y_pred_aligned = np.array(y_pred[-min_len:])
+        y_pred = fitted.fittedvalues if hasattr(fitted, 'fittedvalues') else fitted.predict_in_sample()
+        min_len = min(len(y), len(y_pred))
+        y_true = y[-min_len:]
+        y_pred_aligned = np.array(y_pred[-min_len:])
 
-    rmse = float(np.sqrt(mean_squared_error(y_true, y_pred_aligned)))
-    mae = float(mean_absolute_error(y_true, y_pred_aligned))
-    mape = float(np.mean(np.abs((y_true - y_pred_aligned) / np.clip(y_true, 1, None))) * 100)
+        rmse = float(np.sqrt(mean_squared_error(y_true, y_pred_aligned)))
+        mae = float(mean_absolute_error(y_true, y_pred_aligned))
+        mape = float(np.mean(np.abs((y_true - y_pred_aligned) / np.clip(y_true, 1, None))) * 100)
 
-    training_time = time.perf_counter() - start_time
+        del fitted
+        gc.collect()
 
-    return {
-        "status": "completed",
-        "model_id": model_id,
-        "model_type": model_type,
-        "model_name": f"{model_type.upper()} {order_used}",
-        "metrics": {"rmse": round(rmse, 4), "mae": round(mae, 4), "mape": round(mape, 4)},
-        "training_time": round(training_time, 2),
-    }
+        training_time = time.perf_counter() - start_time
+
+        return {
+            "status": "completed",
+            "model_id": model_id,
+            "model_type": model_type,
+            "model_name": f"{model_type.upper()} {order_used}",
+            "metrics": {"rmse": round(rmse, 4), "mae": round(mae, 4), "mape": round(mape, 4)},
+            "training_time": round(training_time, 2),
+        }
+
+    except Exception as e:
+        gc.collect()
+        raise ValueError(f"Training failed: {str(e)}")
 
 
 # ---------------------------------------------------------------------------
